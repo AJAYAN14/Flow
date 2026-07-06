@@ -45,7 +45,7 @@ import "package:flow/services/transactions.dart";
 import "package:flow/services/user_preferences.dart";
 import "package:flow/services/widget_summary_sync.dart";
 
-import "package:flow/theme/flow_color_scheme.dart";
+
 import "package:flow/theme/theme.dart";
 import "package:flow/widgets/flow_themes.dart";
 import "package:flow/widgets/general/flow_icon.dart";

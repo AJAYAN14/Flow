@@ -11,7 +11,7 @@ import "package:flow/services/file_attachment.dart";
 import "package:flow/services/local_auth.dart";
 import "package:flow/services/notifications.dart";
 import "package:flow/services/user_preferences.dart";
-import "package:flow/theme/flow_color_scheme.dart";
+
 import "package:flow/utils/extensions.dart";
 import "package:flow/widgets/animated_eny_logo.dart";
 import "package:flow/widgets/general/directional_chevron.dart";

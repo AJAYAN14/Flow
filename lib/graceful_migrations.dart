@@ -202,13 +202,7 @@ void migrateThemePrefsToDb() async {
     try {
       // ignore: deprecated_member_use_from_same_package
 
-      final String? themeName = prefs.getString("flow.themeName");
-      final bool themeChangesAppIcon =
-          prefs.getBool("flow.themeChangesAppIcon") ?? true;
-
-      UserPreferencesService().themeName = themeName;
-      UserPreferencesService().themeChangesAppIcon = themeChangesAppIcon;
-
+      // Theme settings migration removed since dynamic themes are deleted
       await prefs.setString("flow.migration.$migrationUuid", "ok");
     } catch (e) {
       _log.warning(
