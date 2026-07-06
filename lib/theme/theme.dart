@@ -1,4 +1,3 @@
-import "package:flow/theme/color_themes/registry.dart";
 import "package:flow/theme/flow_color_scheme.dart";
 import "package:flow/theme/navbar_theme.dart";
 import "package:flow/theme/pie_theme_extension.dart";
@@ -9,6 +8,23 @@ import "package:pie_menu/pie_menu.dart";
 export "helpers.dart";
 
 const Color kTransparent = Color(0x00000000);
+
+// Provide a single, static monochrome theme for the app.
+final FlowColorScheme defaultColorScheme = FlowColorScheme(
+  name: "monochrome",
+  isDark: false,
+  surface: const Color(0xfff7f8fa),
+  onSurface: const Color(0xff101828),
+  primary: const Color(0xff444444),
+  onPrimary: const Color(0xfff7f8fa),
+  secondary: const Color(0xfff1f2f4),
+  onSecondary: const Color(0xff101828),
+  customColors: const FlowCustomColors(
+    income: Color(0xFF15803D),
+    expense: Color(0xFFC42525),
+    semi: Color(0xFF6A666D),
+  ),
+);
 
 class ThemeFactory {
   static const fontFamily = "Poppins";
@@ -192,18 +208,7 @@ class ThemeFactory {
     );
   }
 
-  /// Returns a [ThemeFactory] instance based on the provided [themeName].
-  ///
-  /// If [themeName] is `null`, the default theme is returned.
-  ///
-  /// Pass [preferDark] to influence the choice of default theme.
-  factory ThemeFactory.fromThemeName(
-    String? themeName, {
-    bool preferDark = false,
-    bool preferOled = false,
-  }) {
-    final resolved = getTheme(themeName, preferDark: preferDark);
-
-    return ThemeFactory(resolved);
+  factory ThemeFactory.defaultTheme() {
+    return ThemeFactory(defaultColorScheme);
   }
 }

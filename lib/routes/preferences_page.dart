@@ -11,9 +11,7 @@ import "package:flow/services/file_attachment.dart";
 import "package:flow/services/local_auth.dart";
 import "package:flow/services/notifications.dart";
 import "package:flow/services/user_preferences.dart";
-import "package:flow/theme/color_themes/registry.dart";
 import "package:flow/theme/flow_color_scheme.dart";
-import "package:flow/theme/names.dart";
 import "package:flow/utils/extensions.dart";
 import "package:flow/widgets/animated_eny_logo.dart";
 import "package:flow/widgets/general/directional_chevron.dart";
@@ -63,9 +61,7 @@ class PreferencesPageState extends State<PreferencesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final FlowColorScheme currentTheme = getTheme(
-      UserPreferencesService().themeName,
-    );
+
 
     final bool enableGeo = LocalPreferences().enableGeo.get();
     final bool autoAttachTransactionGeo = LocalPreferences()
@@ -199,17 +195,7 @@ class PreferencesPageState extends State<PreferencesPage> {
             const SizedBox(height: 24.0),
             ListHeader("preferences.appearance".t(context)),
             const SizedBox(height: 8.0),
-            ListTile(
-              title: Text("preferences.theme".t(context)),
-              leading: currentTheme.isDark
-                  ? const Icon(Symbols.dark_mode_rounded)
-                  : const Icon(Symbols.light_mode_rounded),
-              subtitle: Text(
-                (themeNames[currentTheme.name] ?? currentTheme.name).t(context),
-              ),
-              onTap: _openTheme,
-              trailing: const LeChevron(),
-            ),
+
             ListTile(
               title: Text("preferences.numpad".t(context)),
               leading: const Icon(Symbols.dialpad_rounded),
@@ -350,21 +336,6 @@ class PreferencesPageState extends State<PreferencesPage> {
     if (mounted) setState(() {});
   }
 
-  void _openTheme() async {
-    await context.push("/preferences/theme");
-
-    final bool themeChangesAppIcon =
-        UserPreferencesService().themeChangesAppIcon;
-
-    trySetAppIcon(
-      themeChangesAppIcon
-          ? allThemes[UserPreferencesService().themeName]?.iconName
-          : null,
-    );
-
-    // Rebuild to update description text
-    if (mounted) setState(() {});
-  }
 
   void _deleteHangingFiles() async {
     final bool? confirmation = await context.showConfirmationSheet(

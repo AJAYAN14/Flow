@@ -34,7 +34,7 @@ import "package:flow/routes/preferences/numpad_preferences_page.dart";
 import "package:flow/routes/preferences/pending_transactions_preferences_page.dart";
 import "package:flow/routes/preferences/reminders_preferences_page.dart";
 import "package:flow/routes/preferences/sync_preferences_page.dart";
-import "package:flow/routes/preferences/theme_preferences_page.dart";
+
 import "package:flow/routes/preferences/transaction_entry_flow_preferences_page.dart";
 import "package:flow/routes/preferences/transaction_geo_preferences_page.dart";
 import "package:flow/routes/preferences/transaction_list_item_appearance_preferences_page.dart";
@@ -274,10 +274,7 @@ final GoRouter router = GoRouter(
           builder: (context, state) =>
               const TransactionEntryFlowPreferencesPage(),
         ),
-        GoRoute(
-          path: "theme",
-          builder: (context, state) => const ThemePreferencesPage(),
-        ),
+
         GoRoute(
           path: "changeVisuals",
           builder: (context, state) => const ChangeVisualsPreferencesPage(),

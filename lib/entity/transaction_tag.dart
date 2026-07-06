@@ -2,8 +2,8 @@ import "package:flow/data/flow_icon.dart";
 import "package:flow/entity/_base.dart";
 import "package:flow/entity/transaction/tag_type.dart";
 import "package:flow/entity/transaction_type/payload.dart";
-import "package:flow/theme/color_themes/registry.dart";
 import "package:flow/theme/flow_color_scheme.dart";
+import "package:flow/theme/theme.dart";
 import "package:flow/utils/extensions/transaction_tag_type.dart";
 import "package:flow/utils/json/utc_datetime_converter.dart";
 import "package:json_annotation/json_annotation.dart";
@@ -39,7 +39,7 @@ class TransactionTag extends EntityBase {
   String? colorSchemeName;
 
   @Transient()
-  FlowColorScheme? get colorScheme => getThemeStrict(colorSchemeName);
+  FlowColorScheme get colorScheme => defaultColorScheme;
 
   @Transient()
   FlowIconData get icon {

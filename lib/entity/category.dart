@@ -1,8 +1,8 @@
 import "package:flow/data/flow_icon.dart";
 import "package:flow/entity/_base.dart";
 import "package:flow/entity/transaction.dart";
-import "package:flow/theme/color_themes/registry.dart";
 import "package:flow/theme/flow_color_scheme.dart";
+import "package:flow/theme/theme.dart";
 import "package:flow/utils/json/utc_datetime_converter.dart";
 import "package:json_annotation/json_annotation.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
@@ -38,7 +38,7 @@ class Category implements EntityBase {
   String? colorSchemeName;
 
   @Transient()
-  FlowColorScheme? get colorScheme => getThemeStrict(colorSchemeName);
+  FlowColorScheme get colorScheme => defaultColorScheme;
 
   @Transient()
   FlowIconData get icon {

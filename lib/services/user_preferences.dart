@@ -17,7 +17,6 @@ import "package:flow/services/integrations/eny.dart";
 import "package:flow/services/notifications.dart";
 import "package:flow/services/sync.dart";
 import "package:flow/services/widget_summary_sync.dart";
-import "package:flow/theme/color_themes/registry.dart";
 import "package:flutter/material.dart";
 import "package:home_widget/home_widget.dart";
 import "package:intl/intl.dart";
@@ -45,30 +44,7 @@ class UserPreferencesService {
     ObjectBox().box<UserPreferences>().put(value);
   }
 
-  bool get themeChangesAppIcon => value.themeChangesAppIcon;
-  set themeChangesAppIcon(bool newThemeChangesAppIcon) {
-    value.themeChangesAppIcon = newThemeChangesAppIcon;
-    ObjectBox().box<UserPreferences>().put(value);
-  }
 
-  String get themeName {
-    final String? savedThemeName = value.themeName;
-
-    if (validateThemeName(savedThemeName)) {
-      return savedThemeName!;
-    }
-
-    return flowLights.schemes.first.name;
-  }
-
-  String? get themeNameRaw => value.themeName;
-
-  set themeName(String? newThemeName) {
-    if (validateThemeName(newThemeName)) {
-      value.themeName = newThemeName;
-      ObjectBox().box<UserPreferences>().put(value);
-    }
-  }
 
   PendingTimeRange get homePendingTransactionsTimeRange =>
       value.homePendingTransactionsTimeRange;

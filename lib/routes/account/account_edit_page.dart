@@ -17,7 +17,6 @@ import "package:flow/routes/transaction_page/input_amount_sheet.dart";
 import "package:flow/services/transactions.dart";
 import "package:flow/services/user_preferences.dart";
 import "package:flow/sync/export.dart";
-import "package:flow/theme/color_themes/registry.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/utils/utils.dart";
 import "package:flow/widgets/account/update_balance_options_sheet.dart";
@@ -29,7 +28,6 @@ import "package:flow/widgets/general/frame.dart";
 import "package:flow/widgets/general/info_text.dart";
 import "package:flow/widgets/general/money_text.dart";
 import "package:flow/widgets/general/wavy_divider.dart";
-import "package:flow/widgets/select_color_scheme_list_tile.dart";
 import "package:flow/widgets/sheets/select_account_type_sheet.dart";
 import "package:flow/widgets/sheets/select_currency_sheet.dart";
 import "package:flow/widgets/sheets/select_flow_icon_sheet.dart";
@@ -74,7 +72,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
   /// This allows users to update their balance at a specific date
   DateTime? _updateBalanceAt;
 
-  String? _colorSchemeName;
 
   late Account? _currentlyEditing;
 
@@ -113,7 +110,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
           _currentlyEditing?.excludeFromTotalBalance ?? false;
       _archived = _currentlyEditing?.archived ?? false;
       _accountType = _currentlyEditing?.accountType ?? _accountType;
-      _colorSchemeName = _currentlyEditing?.colorSchemeName;
     }
 
     _editNameFocusNode.addListener(() {
@@ -159,7 +155,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
                   size: 96.0,
                   plated: true,
                   onTap: selectIcon,
-                  colorScheme: getThemeStrict(_colorSchemeName),
                 ),
                 const SizedBox(height: 24.0),
                 ConstrainedBox(
@@ -258,14 +253,7 @@ class _AccountEditPageState extends State<AccountEditPage> {
                     ),
                     onTap: inputCreditLimit,
                   ),
-                SelectColorSchemeListTile(
-                  colorScheme: _colorSchemeName,
-                  onChanged: (scheme) {
-                    setState(() {
-                      _colorSchemeName = scheme?.name;
-                    });
-                  },
-                ),
+
                 if (!_archived && _currentlyEditing?.uuid != null)
                   ValueListenableBuilder(
                     valueListenable: UserPreferencesService().valueNotifier,
@@ -466,8 +454,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
 
     _currentlyEditing!.creditLimit = _creditLimit;
     _currentlyEditing!.accountType = _accountType;
-
-    _currentlyEditing!.colorSchemeName = _colorSchemeName;
     _currentlyEditing!.iconCode = iconCodeOrError;
     _currentlyEditing!.excludeFromTotalBalance = _excludeFromTotalBalance;
     _currentlyEditing!.archived = _archived;
@@ -503,7 +489,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
       currency: _currency,
       archived: _archived,
       excludeFromTotalBalance: _excludeFromTotalBalance,
-      colorSchemeName: _colorSchemeName,
       iconCode: iconCodeOrError,
       sortOrder: sortOrder,
       type: _accountType.value,
@@ -537,7 +522,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
     if (_currentlyEditing != null) {
       return _currentlyEditing!.name != _nameTextController.text.trim() ||
           _currentlyEditing!.iconCode != iconCodeOrError ||
-          _currentlyEditing!.colorSchemeName != _colorSchemeName ||
           _currentlyEditing!.archived != _archived ||
           _currentlyEditing!.currency != _currency ||
           (_currentlyEditing!.creditLimit ?? 0) != _creditLimit ||
@@ -550,7 +534,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
 
     return _nameTextController.text.trim().isNotEmpty ||
         _iconData != null ||
-        _colorSchemeName != null ||
         _currency != UserPreferencesService().primaryCurrency ||
         _balance != 0.0 ||
         _creditLimit != 0.0 ||

@@ -13,8 +13,7 @@ import "package:flow/l10n/named_enum.dart";
 import "package:flow/objectbox.dart";
 import "package:flow/objectbox/objectbox.g.dart";
 import "package:flow/services/transactions.dart";
-import "package:flow/theme/color_themes/registry.dart";
-import "package:flow/theme/helpers.dart";
+import "package:flow/theme/theme.dart";
 import "package:flow/utils/extensions/flutter_contact.dart";
 import "package:flow/utils/extensions/transaction_tag_type.dart";
 import "package:flow/utils/utils.dart";
@@ -26,7 +25,6 @@ import "package:flow/widgets/general/frame.dart";
 import "package:flow/widgets/general/info_text.dart";
 import "package:flow/widgets/location_picker_sheet.dart";
 import "package:flow/widgets/open_street_map.dart";
-import "package:flow/widgets/select_color_scheme_list_tile.dart";
 import "package:flow/widgets/sheets/select_contact_sheet.dart";
 import "package:flow/widgets/sheets/select_flow_icon_sheet.dart";
 import "package:flutter/material.dart";
@@ -64,7 +62,6 @@ class _TransactionTagPageState extends State<TransactionTagPage> {
 
   bool _locationBusy = false;
 
-  String? _colorSchemeName;
 
   FlowIconData? _iconData;
 
@@ -85,7 +82,6 @@ class _TransactionTagPageState extends State<TransactionTagPage> {
       _titleController = TextEditingController(text: _currentlyEditing?.title);
       _type = _currentlyEditing?.tagType ?? TransactionTagType.generic;
       _payload = _currentlyEditing?.parsedPayload;
-      _colorSchemeName = _currentlyEditing?.colorSchemeName;
       _iconData = _currentlyEditing?.icon;
 
       if (_type == TransactionTagType.location && _payload?.location != null) {
@@ -141,7 +137,6 @@ class _TransactionTagPageState extends State<TransactionTagPage> {
                   size: 80.0,
                   plated: true,
                   onTap: selectIcon,
-                  colorScheme: getThemeStrict(_colorSchemeName),
                 ),
                 const SizedBox(height: 16.0),
                 Align(
@@ -242,11 +237,6 @@ class _TransactionTagPageState extends State<TransactionTagPage> {
                     ),
                   ),
                 ],
-                SelectColorSchemeListTile(
-                  colorScheme: _colorSchemeName,
-                  onChanged: (scheme) =>
-                      setState(() => _colorSchemeName = scheme?.name),
-                ),
                 if (_currentlyEditing != null) ...[
                   const SizedBox(height: 36.0),
                   DeleteButton(
@@ -421,13 +411,11 @@ class _TransactionTagPageState extends State<TransactionTagPage> {
     if (widget.isNewTag) {
       return _titleController.text.isNotEmpty ||
           _payload != null ||
-          _colorSchemeName != null ||
           _type != TransactionTagType.generic;
     }
 
     return _titleController.text != (_currentlyEditing?.title ?? "") ||
         _type != (_currentlyEditing?.tagType ?? TransactionTagType.generic) ||
-        _colorSchemeName != _currentlyEditing?.colorSchemeName ||
         _payload != _currentlyEditing?.parsedPayload;
   }
 
@@ -438,7 +426,6 @@ class _TransactionTagPageState extends State<TransactionTagPage> {
       ..title = formattedName
       ..type = _type.value
       ..iconCode = iconCodeOrError
-      ..colorSchemeName = _colorSchemeName
       ..payload = _payload?.serialize();
 
     ObjectBox().box<TransactionTag>().put(
@@ -464,7 +451,6 @@ class _TransactionTagPageState extends State<TransactionTagPage> {
       title: formattedName,
       type: _type.value,
       payload: _payload?.serialize(),
-      colorSchemeName: _colorSchemeName,
       iconCode: iconCodeOrError,
     );
 

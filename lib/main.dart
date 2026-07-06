@@ -44,7 +44,7 @@ import "package:flow/services/sync.dart";
 import "package:flow/services/transactions.dart";
 import "package:flow/services/user_preferences.dart";
 import "package:flow/services/widget_summary_sync.dart";
-import "package:flow/theme/color_themes/registry.dart";
+
 import "package:flow/theme/flow_color_scheme.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/widgets/flow_themes.dart";
@@ -188,7 +188,7 @@ class FlowState extends State<Flow> {
   Locale _locale = FlowLocalizations.supportedLocales.first;
   ThemeMode _themeMode = ThemeMode.system;
 
-  ThemeFactory _themeFactory = ThemeFactory.fromThemeName(null);
+  ThemeFactory _themeFactory = ThemeFactory.defaultTheme();
 
   ThemeMode get themeMode => _themeMode;
 
@@ -214,9 +214,7 @@ class FlowState extends State<Flow> {
     super.initState();
 
     _reloadLocale();
-    _reloadTheme();
 
-    UserPreferencesService().valueNotifier.addListener(_reloadTheme);
     UserPreferencesService().valueNotifier.addListener(_listenToShakes);
     UserPreferencesService().valueNotifier.addListener(_syncWidgets);
 
@@ -290,7 +288,6 @@ class FlowState extends State<Flow> {
   void dispose() {
     LocalPreferences().localeOverride.removeListener(_reloadLocale);
     LocalPreferences().primaryCurrency.removeListener(_refreshExchangeRates);
-    UserPreferencesService().valueNotifier.removeListener(_reloadTheme);
     UserPreferencesService().valueNotifier.removeListener(_listenToShakes);
     UserPreferencesService().valueNotifier.removeListener(_syncWidgets);
 
@@ -397,29 +394,6 @@ class FlowState extends State<Flow> {
         }
       },
     );
-  }
-
-  void _reloadTheme() {
-    final String? themeName = UserPreferencesService().value.themeName;
-
-    if (_themeFactory.flowColorScheme.name == themeName) {
-      return;
-    }
-
-    if (validateThemeName(themeName)) {
-      themeLogger.info("Reloading $themeName");
-
-      FlowColorScheme theme = getTheme(themeName, preferDark: useDarkTheme);
-
-      setState(() {
-        _themeMode = theme.mode;
-        _themeFactory = ThemeFactory(theme);
-      });
-    } else {
-      themeLogger.warning(
-        "Invalid theme name: $themeName, falling back to null",
-      );
-    }
   }
 
   void _reloadLocale() {
