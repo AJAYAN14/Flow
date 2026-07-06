@@ -1,0 +1,121 @@
+import "dart:io";
+
+import "package:flow/entity/account.dart";
+import "package:flow/l10n/extensions.dart";
+import "package:flow/objectbox.dart";
+import "package:flow/objectbox/actions.dart";
+import "package:flow/objectbox/objectbox.g.dart";
+import "package:flow/services/user_preferences.dart";
+import "package:flow/widgets/account_card.dart";
+import "package:flow/widgets/general/spinner.dart";
+import "package:flow/widgets/home/home/account/no_accounts.dart";
+import "package:flow/widgets/setup/accounts/add_account_card.dart";
+import "package:flutter/material.dart";
+
+class AccountsPage extends StatefulWidget {
+  const AccountsPage({super.key});
+
+  @override
+  State<AccountsPage> createState() => _AccountsPageState();
+}
+
+class _AccountsPageState extends State<AccountsPage> {
+  String? primaryAccountUuid;
+
+  bool excludeTransfersInTotal = false;
+
+  QueryBuilder<Account> qb() =>
+      ObjectBox().box<Account>().query().order(Account_.sortOrder);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _onUserPreferencesChange();
+    UserPreferencesService().valueNotifier.addListener(
+      _onUserPreferencesChange,
+    );
+  }
+
+  @override
+  void dispose() {
+    UserPreferencesService().valueNotifier.removeListener(
+      _onUserPreferencesChange,
+    );
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("accounts".t(context))),
+      body: StreamBuilder<List<Account>>(
+        stream: qb()
+            .watch(triggerImmediately: true)
+            .map((event) => event.find()),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return SafeArea(child: const Spinner.center());
+          }
+
+          final List<Account> accounts = snapshot.requireData;
+
+          return switch (accounts.length) {
+            0 => SafeArea(child: const NoAccounts()),
+            _ => SingleChildScrollView(
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 16.0),
+                        child: AddAccountCard(),
+                      ),
+                      ...accounts.actives.map(
+                        (account) => Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: AccountCard(
+                            primary: account.uuid == primaryAccountUuid,
+                            account: account,
+                            useCupertinoContextMenu: Platform.isIOS,
+                            excludeTransfersInTotal: excludeTransfersInTotal,
+                          ),
+                        ),
+                      ),
+                      ...accounts.inactives.map(
+                        (account) => Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: AccountCard(
+                            account: account,
+                            useCupertinoContextMenu: Platform.isIOS,
+                            excludeTransfersInTotal: excludeTransfersInTotal,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          };
+        },
+      ),
+    );
+  }
+
+  void _onUserPreferencesChange() {
+    excludeTransfersInTotal = UserPreferencesService().excludeTransfersFromFlow;
+
+    try {
+      primaryAccountUuid = UserPreferencesService().primaryAccountUuid;
+    } catch (e) {
+      //
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+}

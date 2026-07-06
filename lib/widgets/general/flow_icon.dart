@@ -1,0 +1,140 @@
+import "dart:io";
+
+import "package:flow/data/flow_icon.dart";
+import "package:flow/objectbox.dart";
+import "package:flow/theme/flow_color_scheme.dart";
+import "package:flow/theme/theme.dart";
+import "package:flow/widgets/general/surface.dart";
+import "package:flutter/material.dart";
+import "package:material_symbols_icons_flow/symbols.dart";
+import "package:path/path.dart";
+
+class FlowIcon extends StatelessWidget {
+  final FlowIconData data;
+
+  final double size;
+  final Color? color;
+
+  final bool plated;
+
+  /// Defaults to theme secondary color
+  final Color? plateColor;
+
+  final FlowColorScheme? colorScheme;
+
+  final double plateElevation;
+
+  /// Padding outside [size]
+  final EdgeInsets platePadding;
+
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
+  final double fill;
+
+  final BorderRadius borderRadius;
+
+  const FlowIcon(
+    this.data, {
+    super.key,
+    this.color,
+    this.plateColor,
+    this.plateElevation = 0.0,
+    this.size = 24.0,
+    this.fill = 1.0,
+    this.plated = false,
+    this.borderRadius = const .all(Radius.circular(16.0)),
+    this.platePadding = const EdgeInsets.all(8.0),
+    this.onTap,
+    this.onLongPress,
+    this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Color iconColor =
+        color ?? colorScheme?.primary ?? context.colorScheme.primary;
+
+    if (!plated) return buildChild(context, data, iconColor);
+
+    final Color plateColor =
+        this.plateColor ??
+        colorScheme?.secondary ??
+        context.colorScheme.secondary;
+
+    return Surface(
+      builder: (BuildContext context) => InkWell(
+        borderRadius: borderRadius,
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Padding(
+          padding: platePadding,
+          child: buildChild(context, data, iconColor),
+        ),
+      ),
+      color: plateColor,
+      iconColor: iconColor,
+      shape: RoundedRectangleBorder(borderRadius: borderRadius),
+      elevation: plateElevation,
+    );
+  }
+
+  Widget buildChild(BuildContext context, FlowIconData data, Color color) {
+    return switch (data) {
+      IconFlowIcon icon => Icon(
+        icon.iconData,
+        size: size,
+        color: color,
+        fill: fill,
+      ),
+      SimpleIconFlowIcon simpleIcon => Icon(
+        // Falls back to a neutral glyph if the brand was removed/renamed
+        // upstream and the slug no longer resolves.
+        simpleIcon.iconData ?? Symbols.help_rounded,
+        size: size,
+        color: color,
+        fill: fill,
+      ),
+      ImageFlowIcon image => ClipRRect(
+        borderRadius: borderRadius.subtract(.circular(platePadding.top)),
+        child: Image.file(
+          File(join(ObjectBox.appDataDirectory, image.imagePath)),
+          width: size,
+          height: size,
+          errorBuilder: (context, error, stackTrace) => Icon(
+            Symbols.error_rounded,
+            color: context.flowColors.expense,
+            size: size,
+          ),
+        ),
+      ),
+      CharacterFlowIcon character => SizedBox.square(
+        dimension: size,
+        child: Center(
+          child: RichText(
+            textHeightBehavior: TextHeightBehavior(
+              applyHeightToFirstAscent: false,
+              applyHeightToLastDescent: false,
+              leadingDistribution: TextLeadingDistribution.proportional,
+            ),
+            text: TextSpan(
+              text: character.character,
+              spellOut: false,
+              style: TextStyle(
+                overflow: TextOverflow.visible,
+                fontWeight: FontWeight.w500,
+                fontFamily: "Poppins",
+                fontSize: size * 0.75,
+                height: 1.0,
+                inherit: false,
+                color: color,
+              ),
+            ),
+            textDirection: TextDirection.ltr,
+          ),
+        ),
+      ),
+      _ => Container(),
+    };
+  }
+}

@@ -1,0 +1,140 @@
+import "dart:io";
+
+import "package:cross_file/cross_file.dart";
+import "package:flow/constants.dart";
+import "package:flow/l10n/extensions.dart";
+import "package:flow/sync/import.dart";
+import "package:flow/sync/import/base.dart";
+import "package:flow/utils/extensions/importer.dart";
+import "package:flow/utils/utils.dart";
+import "package:flow/widgets/general/list_header.dart";
+import "package:flow/widgets/general/spinner.dart";
+import "package:flow/widgets/import/file_select_area.dart";
+import "package:flutter/material.dart";
+import "package:logging/logging.dart";
+import "package:material_symbols_icons_flow/symbols.dart";
+import "package:simple_icons_flow/simple_icons_flow.dart";
+
+final Logger _log = Logger("ImportPage");
+
+class ImportPage extends StatefulWidget {
+  final bool? setupMode;
+
+  const ImportPage({this.setupMode = false, super.key});
+
+  @override
+  State<ImportPage> createState() => _ImportPageState();
+}
+
+class _ImportPageState extends State<ImportPage> {
+  Importer? importer;
+
+  bool busy = false;
+
+  dynamic error;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("sync.import".t(context))),
+      body: SafeArea(
+        child: busy
+            ? const Spinner.center()
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: .start,
+                  children: [
+                    FileSelectArea(
+                      onFileDropped: initiateImportFromDroppedFile,
+                      onTap: initiateImport,
+                    ),
+                    const SizedBox(height: 16.0),
+                    ListHeader("sync.import.other".t(context)),
+                    const SizedBox(height: 8.0),
+                    ListTile(
+                      leading: ClipRRect(
+                        borderRadius: const .all(Radius.circular(4.0)),
+                        child: Image.asset(
+                          "assets/images/external/ivy_wallet.png",
+                          width: IconTheme.of(context).size,
+                          height: IconTheme.of(context).size,
+                        ),
+                      ),
+                      trailing: Icon(Symbols.chevron_right_rounded),
+                      title: Text("Ivy Wallet (CSV)"),
+                      onTap: () => initiateImport(
+                        externalFormat: ImportExternalFormat.ivyWallet,
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(SimpleIcons.googlesheets),
+                      trailing: Icon(Symbols.chevron_right_rounded),
+                      title: Text("sync.import.getCSVTemplate".t(context)),
+                      onTap: () => openUrl(csvImportTemplateUrl),
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  Future<void> initiateImport({
+    File? backupFile,
+    ImportExternalFormat? externalFormat,
+  }) async {
+    if (busy) return;
+
+    setState(() {
+      busy = true;
+    });
+
+    try {
+      importer = await importBackup(
+        backupFile: backupFile,
+        externalFormat: externalFormat,
+      );
+
+      if (mounted) {
+        if (importer == null) {
+          context.showErrorToast(error: "error.input.noFilePicked".t(context));
+        } else {
+          importer!.goToRelevantPage(
+            context,
+            setupMode: widget.setupMode ?? false,
+          );
+        }
+      }
+    } catch (e, stackTrace) {
+      _log.severe("Importer error", e, stackTrace);
+      if (mounted) {
+        context.showErrorToast(error: e);
+      }
+    } finally {
+      busy = false;
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  Future<void> initiateImportFromDroppedFile(XFile? file) async {
+    if (file == null) {
+      context.showErrorToast(error: "error.input.noFilePicked".t(context));
+      return;
+    }
+
+    _log.fine("Trying to import from dragged file: ${file.path}");
+
+    final backupFile = File(file.path);
+
+    if (!(await backupFile.exists())) {
+      if (mounted) {
+        context.showErrorToast(error: "error.input.noFilePicked".t(context));
+      }
+      return;
+    }
+
+    return initiateImport(backupFile: backupFile);
+  }
+}

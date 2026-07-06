@@ -1,0 +1,400 @@
+import "dart:async";
+import "dart:convert";
+
+import "package:flow/data/prefs/frecency.dart";
+import "package:flow/data/string_multi_filter.dart";
+import "package:flow/data/transaction_filter.dart";
+import "package:flow/data/transactions_filter/time_range.dart";
+import "package:flow/entity/account.dart";
+import "package:flow/entity/category.dart";
+import "package:flow/entity/transaction.dart";
+import "package:flow/entity/transaction_tag.dart";
+import "package:flow/objectbox.dart";
+import "package:flow/prefs/local_preferences.dart";
+import "package:flow/services/accounts.dart";
+import "package:flow/services/transactions.dart";
+import "package:flow/services/user_preferences.dart";
+import "package:local_settings/local_settings.dart";
+import "package:logging/logging.dart";
+import "package:moment_dart/moment_dart.dart";
+import "package:shared_preferences/shared_preferences.dart";
+
+final Logger _log = Logger("TransitiveLocalPreferences");
+
+class TransitiveLocalPreferences {
+  final SharedPreferencesWithCache _prefs;
+
+  static TransitiveLocalPreferences? _instance;
+
+  /// Whether the user uses only one currency across accounts
+  late final BoolSettingsEntry usesNonPrimaryCurrency;
+  late final BoolSettingsEntry usesMultipleCurrencies;
+
+  late final DateTimeSettingsEntry transitiveLastTimeFrecencyUpdated;
+
+  /// Forces a one-shot rebuild of category frecency the first time the app
+  /// runs after the typed-frecency change, so existing users get
+  /// `category:income` / `category:expense` records backfilled immediately
+  /// instead of waiting for the next daily reevaluation rollover.
+  late final BoolSettingsEntry categoryFrecencyTypedBuilt;
+
+  late final DateTimeSettingsEntry lastAutoBackupRanAt;
+  late final PrimitiveSettingsEntry<String> lastAutoBackupPath;
+
+  late final DateTimeSettingsEntry lastSuccessfulICloudSyncAt;
+  late final BoolSettingsEntry iCloudSyncWorkingFine;
+
+  late final BoolSettingsEntry sessionPrivacyMode;
+
+  // For internal notifications
+  late final PrimitiveSettingsEntry<String> lastSavedAutoBackupPath;
+  late final DateTimeSettingsEntry lastRateAppShowedAt;
+
+
+  factory TransitiveLocalPreferences() {
+    if (_instance == null) {
+      throw Exception(
+        "You must initialize TransitiveLocalPreferences by calling initialize().",
+      );
+    }
+
+    return _instance!;
+  }
+
+  TransitiveLocalPreferences._internal(this._prefs) {
+    SettingsEntry.defaultPrefix = "flow.";
+
+    usesNonPrimaryCurrency = BoolSettingsEntry(
+      key: "transitive.usesNonPrimaryCurrency",
+      preferences: _prefs,
+      initialValue: false,
+    );
+    usesMultipleCurrencies = BoolSettingsEntry(
+      key: "transitive.usesMultipleCurrencies",
+      preferences: _prefs,
+      initialValue: false,
+    );
+
+    transitiveLastTimeFrecencyUpdated = DateTimeSettingsEntry(
+      key: "transitive.lastTimeFrecencyUpdated",
+      preferences: _prefs,
+    );
+
+    categoryFrecencyTypedBuilt = BoolSettingsEntry(
+      // Versioned key: bump the suffix whenever the reevaluation logic
+      // changes in a way that needs to be re-run for existing users.
+      key: "transitive.categoryFrecencyTypedBuilt.v2",
+      preferences: _prefs,
+      initialValue: false,
+    );
+
+    lastAutoBackupRanAt = DateTimeSettingsEntry(
+      key: "transitive.lastAutoBackupRanAt",
+      preferences: _prefs,
+    );
+
+    lastAutoBackupPath = PrimitiveSettingsEntry<String>(
+      key: "transitive.lastAutoBackupPath",
+      preferences: _prefs,
+    );
+
+    lastSuccessfulICloudSyncAt = DateTimeSettingsEntry(
+      key: "transitive.lastSuccessfulICloudSyncAt",
+      preferences: _prefs,
+    );
+
+    iCloudSyncWorkingFine = BoolSettingsEntry(
+      key: "transitive.iCloudSyncWorkingFine",
+      preferences: _prefs,
+      initialValue: true,
+    );
+
+    sessionPrivacyMode = BoolSettingsEntry(
+      key: "transitive.sessionPrivacyMode",
+      preferences: _prefs,
+      initialValue: false,
+    );
+
+    lastRateAppShowedAt = DateTimeSettingsEntry(
+      key: "transitive.lastRateAppShowedAt",
+      preferences: _prefs,
+    );
+
+
+
+    lastSavedAutoBackupPath = PrimitiveSettingsEntry<String>(
+      key: "transitive.lastSavedAutoBackupPath",
+      preferences: _prefs,
+    );
+
+    unawaited(updateTransitiveProperties());
+  }
+
+  Future<void> updateTransitiveProperties() async {
+    try {
+      final accounts = await AccountsService().getAll();
+
+      final String primaryCurrency = UserPreferencesService().primaryCurrency;
+
+      final bool hasAnyNonPrimaryCurrencyAccount = accounts.any(
+        (account) => account.currency != primaryCurrency,
+      );
+
+      await usesNonPrimaryCurrency.set(hasAnyNonPrimaryCurrencyAccount);
+      await usesMultipleCurrencies.set(
+        accounts.map((account) => account.currency).toSet().length > 1,
+      );
+    } catch (e, stackTrace) {
+      _log.warning("Cannot update transitive properties", e, stackTrace);
+    }
+
+    try {
+      unawaited(sessionPrivacyMode.set(LocalPreferences().privacyMode.get()));
+    } catch (e) {
+      _log.warning("Failed to seed sessionPrivacyMode from privacyMode", e);
+    }
+
+    try {
+      if (transitiveLastTimeFrecencyUpdated.get() == null ||
+          !transitiveLastTimeFrecencyUpdated.get()!.isAtSameDayAs(
+            Moment.now(),
+          )) {
+        unawaited(
+          _reevaluateCategoryFrecency().then(
+            (_) => categoryFrecencyTypedBuilt.set(true),
+          ),
+        );
+        unawaited(_reevaluateAccountFrecency());
+        unawaited(_reevaluateTransactionTagFrecency());
+        unawaited(transitiveLastTimeFrecencyUpdated.set(DateTime.now()));
+      } else if (!categoryFrecencyTypedBuilt.get()) {
+        unawaited(
+          _reevaluateCategoryFrecency().then(
+            (_) => categoryFrecencyTypedBuilt.set(true),
+          ),
+        );
+      }
+    } catch (e) {
+      _log.warning("Failed to reevaluate frecency caches", e);
+    }
+  }
+
+  static String categoryFrecencyType(TransactionType type) =>
+      "category:${type.value}";
+
+  /// Frecency storage keys to consult for category ranking. When [type] is
+  /// null (e.g. bulk-change-category, or a transfer where categories aren't
+  /// typed), combine income and expense so categories still rank by overall
+  /// usage.
+  static List<String> categoryFrecencyTypesFor(TransactionType? type) {
+    return switch (type) {
+      TransactionType.income || TransactionType.expense => [
+        categoryFrecencyType(type!),
+      ],
+      _ => const ["category:income", "category:expense"],
+    };
+  }
+
+  Future<FrecencyData?> setFrecencyData(
+    String type,
+    String uuid,
+    FrecencyData? value,
+  ) async {
+    final String prefixedKey = "transitive.frecency.$type.$uuid";
+
+    if (value == null) {
+      await _prefs.remove(prefixedKey);
+      return null;
+    } else {
+      await _prefs.setString(prefixedKey, jsonEncode(value.toJson()));
+      return value;
+    }
+  }
+
+  Future<FrecencyData?> updateFrecencyData(String type, String uuid) async {
+    final FrecencyData current =
+        getFrecencyData(type, uuid) ??
+        FrecencyData(lastUsed: DateTime.now(), useCount: 0, uuid: uuid);
+
+    return await setFrecencyData(type, uuid, current.incremented());
+  }
+
+  FrecencyData? getFrecencyData(String type, String uuid) {
+    final String prefixedKey = "transitive.frecency.$type.$uuid";
+
+    final raw = _prefs.getString(prefixedKey);
+
+    if (raw == null) return null;
+
+    try {
+      return FrecencyData.fromJson(jsonDecode(raw));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> _reevaluateCategoryFrecency() async {
+    final List<Category> categories = await ObjectBox()
+        .box<Category>()
+        .getAllAsync();
+
+    if (categories.isEmpty) {
+      return;
+    }
+
+    const List<TransactionType> typesToBuild = [
+      TransactionType.income,
+      TransactionType.expense,
+    ];
+
+    for (final category in categories) {
+      try {
+        // TransactionFilter.types is a post-query Dart predicate — it is
+        // ignored by ObjectBox count()/findFirst(). Query once per category
+        // and partition by Transaction.type in memory so the income vs
+        // expense split is actually applied.
+        final TransactionFilter filter = TransactionFilter(
+          categories: StringMultiFilter.whitelist([category.uuid]),
+          range: TransactionFilterTimeRange.fromTimeRange(
+            (Moment.now() - const Duration(days: 180)).rangeTo(Moment.now()),
+          ),
+          sortBy: TransactionSortField.transactionDate,
+          sortDescending: true,
+        );
+
+        final List<Transaction> recent = TransactionsService().findManySync(
+          filter,
+        );
+
+        for (final type in typesToBuild) {
+          final List<Transaction> typed = recent
+              .where((t) => t.type == type)
+              .toList();
+
+          if (typed.isEmpty) {
+            unawaited(
+              setFrecencyData(
+                categoryFrecencyType(type),
+                category.uuid,
+                null,
+              ),
+            );
+            continue;
+          }
+
+          unawaited(
+            setFrecencyData(
+              categoryFrecencyType(type),
+              category.uuid,
+              FrecencyData(
+                uuid: category.uuid,
+                lastUsed: typed.first.transactionDate,
+                useCount: typed.length,
+              ),
+            ),
+          );
+        }
+      } catch (e, stackTrace) {
+        _log.warning(
+          "Failed to build category FrecencyData for $category",
+          e,
+          stackTrace,
+        );
+      }
+    }
+  }
+
+  Future<void> _reevaluateAccountFrecency() async {
+    final List<Account> accounts = await AccountsService().getAll();
+
+    if (accounts.isEmpty) {
+      return;
+    }
+
+    for (final account in accounts) {
+      try {
+        final TransactionFilter filter = TransactionFilter(
+          accounts: StringMultiFilter.whitelist([account.uuid]),
+          range: TransactionFilterTimeRange.fromTimeRange(
+            (Moment.now() - const Duration(days: 180)).rangeTo(Moment.now()),
+          ),
+          sortBy: TransactionSortField.transactionDate,
+          sortDescending: true,
+        );
+
+        final int useCount = TransactionsService().countMany(filter);
+        final DateTime lastUsed =
+            TransactionsService().findFirstSync(filter)?.transactionDate ??
+            DateTime.fromMillisecondsSinceEpoch(0);
+
+        unawaited(
+          setFrecencyData(
+            "account",
+            account.uuid,
+            FrecencyData(
+              uuid: account.uuid,
+              lastUsed: lastUsed,
+              useCount: useCount,
+            ),
+          ),
+        );
+      } catch (e, stackTrace) {
+        _log.warning(
+          "Failed to build account FrecencyData for $account",
+          e,
+          stackTrace,
+        );
+      }
+    }
+  }
+
+  Future<void> _reevaluateTransactionTagFrecency() async {
+    final List<TransactionTag> tags = await ObjectBox()
+        .box<TransactionTag>()
+        .getAllAsync();
+
+    if (tags.isEmpty) {
+      return;
+    }
+
+    for (final tag in tags) {
+      try {
+        final TransactionFilter filter = TransactionFilter(
+          tags: StringMultiFilter.whitelist([tag.uuid]),
+          range: TransactionFilterTimeRange.fromTimeRange(
+            (Moment.now() - const Duration(days: 180)).rangeTo(Moment.now()),
+          ),
+          sortBy: TransactionSortField.transactionDate,
+          sortDescending: true,
+        );
+
+        final int useCount = TransactionsService().countMany(filter);
+        final DateTime lastUsed =
+            TransactionsService().findFirstSync(filter)?.transactionDate ??
+            DateTime.fromMillisecondsSinceEpoch(0);
+
+        unawaited(
+          setFrecencyData(
+            "tag",
+            tag.uuid,
+            FrecencyData(
+              uuid: tag.uuid,
+              lastUsed: lastUsed,
+              useCount: useCount,
+            ),
+          ),
+        );
+      } catch (e, stackTrace) {
+        _log.warning(
+          "Failed to build tag FrecencyData for $tag",
+          e,
+          stackTrace,
+        );
+      }
+    }
+  }
+
+  static TransitiveLocalPreferences initialize(
+    SharedPreferencesWithCache instance,
+  ) => _instance ??= TransitiveLocalPreferences._internal(instance);
+}
