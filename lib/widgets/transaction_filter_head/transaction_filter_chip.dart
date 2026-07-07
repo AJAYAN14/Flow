@@ -7,7 +7,7 @@ import "package:flutter/material.dart";
 
 class TransactionFilterChip<T> extends StatelessWidget {
   final Widget? avatar;
-
+  final Color? iconColor;
   final bool? highlightOverride;
 
   /// Translation key for the label
@@ -70,6 +70,7 @@ class TransactionFilterChip<T> extends StatelessWidget {
   const TransactionFilterChip({
     super.key,
     this.avatar,
+    this.iconColor,
     this.value,
     this.defaultValue,
     this.displayLabelOverride,
@@ -81,10 +82,43 @@ class TransactionFilterChip<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Premium chip colors
+    const premiumBlue = Color(0xFF2563EB); // Royal Blue
+    const unselectedBg = Color(0xFFFFFFFF); // White
+    const selectedBg = Color(0xFFEFF6FF); // Blue 50
+    const unselectedText = Color(0xFF334155); // Slate 700
+    const selectedText = premiumBlue;
+    const borderColor = Color(0xFFE2E8F0); // Slate 200
+
     return FilterChip(
       showCheckmark: false,
-      avatar: avatar,
-      label: Text(getLabel(context), overflow: TextOverflow.ellipsis),
+      avatar: avatar != null
+          ? IconTheme.merge(
+              data: IconThemeData(
+                color: highlight ? selectedText : (iconColor ?? unselectedText),
+                size: 18.0,
+              ),
+              child: avatar!,
+            )
+          : null,
+      label: Text(
+        getLabel(context), 
+        overflow: TextOverflow.ellipsis,
+      ),
+      labelStyle: TextStyle(
+        color: highlight ? selectedText : unselectedText,
+        fontWeight: highlight ? FontWeight.w600 : FontWeight.w500,
+      ),
+      backgroundColor: unselectedBg,
+      selectedColor: selectedBg,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(100.0),
+        side: BorderSide(
+          color: highlight ? premiumBlue.withAlpha(0x40) : borderColor,
+        ),
+      ),
+      elevation: 0,
+      pressElevation: 0,
       onSelected: (_) => onSelect(),
       selected: highlight,
     );

@@ -12,6 +12,7 @@ import "package:flow/theme/theme.dart";
 import "package:flow/utils/utils.dart";
 import "package:flow/widgets/general/button.dart";
 import "package:flow/widgets/general/list_header.dart";
+import "package:flow/widgets/general/premium_list_tile.dart";
 import "package:flow/widgets/general/spinner.dart";
 import "package:flow/widgets/home/preferences/profile_card.dart";
 import "package:flutter/material.dart";
@@ -42,175 +43,215 @@ class _ProfileTabState extends State<ProfileTab> {
           const SizedBox(height: 24.0),
           const Center(child: ProfileCard()),
           const SizedBox(height: 24.0),
-          ListTile(
-            title: Text("tabs.stats.insights".t(context)),
-            leading: const Icon(Symbols.insights_rounded),
-            trailing: LocalPreferences().openedInsightsIndex.get()
-                ? null
-                : Badge(
-                    label: Text("general.new".t(context)),
-                    backgroundColor: context.colorScheme.primary,
-                    textColor: context.colorScheme.onPrimary,
-                  ),
-            onTap: () {
-              final entry = LocalPreferences().openedInsightsIndex;
-              if (!entry.get()) {
-                entry.set(true);
-                setState(() {});
-              }
-              context.push("/stats/insights");
-            },
-          ),
-          ListTile(
-            title: Text("accounts".t(context)),
-            leading: const Icon(Symbols.wallet_rounded),
-            onTap: () => context.push("/accounts"),
-          ),
-          ListTile(
-            title: Text("categories".t(context)),
-            leading: const Icon(Symbols.category_rounded),
-            onTap: () => context.push("/categories"),
-          ),
-          // ListTile(
-          //   title: Text("budgets".t(context)),
-          //   leading: const Icon(Symbols.money_bag_rounded),
-          //   onTap: () => context.push("/budgets"),
-          // ),
-          // ListTile(
-          //   title: Text("goals".t(context)),
-          //   leading: const Icon(Symbols.savings_rounded),
-          //   onTap: () => context.push("/goals"),
-          // ),
-          ListTile(
-            title: Text("transaction.tags".t(context)),
-            leading: const Icon(Symbols.style_rounded),
-            onTap: () => context.push("/transactionTags"),
-          ),
-          ListTile(
-            title: Text("preferences.transactions.pending".t(context)),
-            leading: const Icon(Symbols.search_activity_rounded),
-            onTap: () => context.push("/transactions/pending"),
+          PremiumListGroup(
+            children: [
+              PremiumListTile(
+                title: Text("tabs.stats.insights".t(context)),
+                leading: Symbols.insights_rounded,
+                accent: const Color(0xFF8B5CF6), // Purple
+                trailing: LocalPreferences().openedInsightsIndex.get()
+                    ? null
+                    : Badge(
+                        label: Text("general.new".t(context)),
+                        backgroundColor: context.colorScheme.primary,
+                        textColor: context.colorScheme.onPrimary,
+                      ),
+                onTap: () {
+                  final entry = LocalPreferences().openedInsightsIndex;
+                  if (!entry.get()) {
+                    entry.set(true);
+                    setState(() {});
+                  }
+                  context.push("/stats/insights");
+                },
+              ),
+              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)), // Slate 100
+              PremiumListTile(
+                title: Text("accounts".t(context)),
+                leading: Symbols.wallet_rounded,
+                accent: const Color(0xFF3B82F6), // Blue
+                onTap: () => context.push("/accounts"),
+              ),
+              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+              PremiumListTile(
+                title: Text("categories".t(context)),
+                leading: Symbols.category_rounded,
+                accent: const Color(0xFFF43F5E), // Rose
+                onTap: () => context.push("/categories"),
+              ),
+              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+              PremiumListTile(
+                title: Text("transaction.tags".t(context)),
+                leading: Symbols.style_rounded,
+                accent: const Color(0xFFF59E0B), // Amber
+                onTap: () => context.push("/transactionTags"),
+              ),
+              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+              PremiumListTile(
+                title: Text("preferences.transactions.pending".t(context)),
+                leading: Symbols.search_activity_rounded,
+                accent: const Color(0xFF14B8A6), // Teal
+                onTap: () => context.push("/transactions/pending"),
+              ),
+            ],
           ),
           const SizedBox(height: 32.0),
-          ListHeader("tabs.profile.community".t(context)),
-          ListTile(
-            title: Text("tabs.profile.support".t(context)),
-            leading: const Icon(Symbols.favorite_rounded),
-            onTap: () => context.push("/support"),
+          ListHeader("tabs.profile.community".t(context), padding: const EdgeInsets.symmetric(horizontal: 24.0)),
+          PremiumListGroup(
+            children: [
+              PremiumListTile(
+                title: Text("tabs.profile.support".t(context)),
+                leading: Symbols.favorite_rounded,
+                accent: const Color(0xFFEC4899), // Pink
+                onTap: () => context.push("/support"),
+              ),
+              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+              PremiumListTile(
+                title: Text("tabs.profile.recommend".t(context)),
+                leading: Symbols.share_rounded,
+                accent: const Color(0xFF6366F1), // Indigo
+                onTap: () => context.showUriShareSheet(uri: website),
+              ),
+            ],
           ),
-
-          ListTile(
-            title: Text("tabs.profile.recommend".t(context)),
-            leading: const Icon(Symbols.share_rounded),
-            onTap: () => context.showUriShareSheet(uri: website),
-          ),
-          // ListTile(
-          //   title: Text("tabs.profile.guide".t(context)),
-          //   leading: const Icon(Symbols.book_2_rounded),
-          //   onTap: () => openUrl(guideUrl),
-          // ),
-
           const SizedBox(height: 32.0),
-          ListHeader("tabs.profile.other".t(context)),
-          ListTile(
-            title: Text("transaction.deleted".t(context)),
-            leading: const Icon(Symbols.delete_rounded),
-            onTap: () => context.push("/transactions/deleted"),
-          ),
-          ListTile(
-            title: Text("tabs.profile.backup".t(context)),
-            leading: const Icon(Symbols.hard_drive_rounded),
-            onTap: () => context.push("/exportOptions"),
-          ),
-          ListTile(
-            title: Text("tabs.profile.import".t(context)),
-            leading: const Icon(Symbols.restore_page_rounded),
-            onTap: () => context.push("/import"),
-          ),
-          ListTile(
-            title: Text("tabs.profile.preferences".t(context)),
-            leading: const Icon(Symbols.settings_rounded),
-            onTap: () => context.push("/preferences"),
+          ListHeader("tabs.profile.other".t(context), padding: const EdgeInsets.symmetric(horizontal: 24.0)),
+          PremiumListGroup(
+            children: [
+              PremiumListTile(
+                title: Text("transaction.deleted".t(context)),
+                leading: Symbols.delete_rounded,
+                accent: const Color(0xFFEF4444), // Red
+                onTap: () => context.push("/transactions/deleted"),
+              ),
+              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+              PremiumListTile(
+                title: Text("tabs.profile.backup".t(context)),
+                leading: Symbols.hard_drive_rounded,
+                accent: const Color(0xFF8B5CF6), // Purple
+                onTap: () => context.push("/exportOptions"),
+              ),
+              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+              PremiumListTile(
+                title: Text("tabs.profile.import".t(context)),
+                leading: Symbols.restore_page_rounded,
+                accent: const Color(0xFF10B981), // Emerald
+                onTap: () => context.push("/import"),
+              ),
+              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+              PremiumListTile(
+                title: Text("tabs.profile.preferences".t(context)),
+                leading: Symbols.settings_rounded,
+                accent: const Color(0xFF64748B), // Slate 500
+                onTap: () => context.push("/preferences"),
+              ),
+            ],
           ),
           if (flowDebugMode) ...[
             const SizedBox(height: 32.0),
-            ListHeader("debug.options".t(context)),
-            ListTile(
-              title: Text("debug.themeTestPage".t(context)),
-              leading: const Icon(Symbols.palette_rounded),
-              onTap: () => context.push("/_debug/theme"),
-            ),
-            ListTile(
-              title: Text("debug.viewScheduledNotifications".t(context)),
-              leading: const Icon(Symbols.notifications_rounded),
-              onTap: () => context.push("/_debug/scheduledNotifications"),
-            ),
-            ListTile(
-              title: Text("debug.iCloudDebugExplorer".t(context)),
-              leading: const Icon(Symbols.cloud_rounded),
-              onTap: () => context.push("/_debug/iCloud"),
-            ),
-            ListTile(
-              title: Text("debug.scheduleDebugNotification".t(context)),
-              leading: const Icon(Symbols.notification_add_rounded),
-              onTap: () {
-                NotificationsService()
-                    .debugSchedule(Moment.now().startOfNextMinute())
-                    .then((_) {
-                      if (context.mounted) {
-                        context.showToast(
-                          text: "debug.debugNotificationScheduled".t(context),
-                        );
-                      }
-                    });
-              },
-            ),
-            ListTile(
-              title: Text("debug.showDebugNotification".t(context)),
-              leading: const Icon(Symbols.notifications_rounded),
-              onTap: () => NotificationsService().debugShow(),
-              onLongPress: () => Future.delayed(
-                const Duration(seconds: 3),
-                () => NotificationsService().debugShow(),
-              ),
-            ),
-            ListTile(
-              title: Text("debug.clearExchangeRatesCache".t(context)),
-              onTap: () => clearExchangeRatesCache(),
-              leading: const Icon(Symbols.adb_rounded),
-            ),
-            ListTile(
-              title: Text("debug.populateObjectbox".t(context)),
-              leading: const Icon(Symbols.adb_rounded),
-              onTap: () => ObjectBox().createAndPutDebugData(),
-            ),
-            ListTile(
-              title: Text(
-                _debugDbBusy ? "debug.clearingDatabase".t(context) : "debug.clearObjectbox".t(context),
-              ),
-              onTap: () => resetDatabase(),
-              leading: _debugDbBusy
-                  ? const SizedBox(
-                      width: 24.0,
-                      height: 24.0,
-                      child: Spinner.center(),
-                    )
-                  : const Icon(Symbols.adb_rounded),
-            ),
-            ListTile(
-              title: Text("debug.clearSharedPreferences".t(context)),
-              onTap: () => resetPrefs(),
-              leading: const Icon(Symbols.adb_rounded),
-            ),
-            ListTile(
-              title: Text("debug.purgeICloudDebugFolder".t(context)),
-              onTap: () => debugPurgeICloud(),
-              leading: const Icon(Symbols.adb_rounded),
-            ),
-            ListTile(
-              title: Text("debug.jumpToSetupPage".t(context)),
-              onTap: () => context.pushReplacement("/setup"),
-              leading: const Icon(Symbols.settings_rounded),
+            ListHeader("debug.options".t(context), padding: const EdgeInsets.symmetric(horizontal: 24.0)),
+            PremiumListGroup(
+              children: [
+                PremiumListTile(
+                  title: Text("debug.themeTestPage".t(context)),
+                  leading: Symbols.palette_rounded,
+                  accent: const Color(0xFF94A3B8), // Slate 400
+                  onTap: () => context.push("/_debug/theme"),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.viewScheduledNotifications".t(context)),
+                  leading: Symbols.notifications_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () => context.push("/_debug/scheduledNotifications"),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.iCloudDebugExplorer".t(context)),
+                  leading: Symbols.cloud_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () => context.push("/_debug/iCloud"),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.scheduleDebugNotification".t(context)),
+                  leading: Symbols.notification_add_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () {
+                    NotificationsService()
+                        .debugSchedule(Moment.now().startOfNextMinute())
+                        .then((_) {
+                          if (context.mounted) {
+                            context.showToast(
+                              text: "debug.debugNotificationScheduled".t(context),
+                            );
+                          }
+                        });
+                  },
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.showDebugNotification".t(context)),
+                  leading: Symbols.notifications_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () => NotificationsService().debugShow(),
+                  onLongPress: () => Future.delayed(
+                    const Duration(seconds: 3),
+                    () => NotificationsService().debugShow(),
+                  ),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.clearExchangeRatesCache".t(context)),
+                  leading: Symbols.adb_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () => clearExchangeRatesCache(),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.populateObjectbox".t(context)),
+                  leading: Symbols.adb_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () => ObjectBox().createAndPutDebugData(),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text(
+                    _debugDbBusy ? "debug.clearingDatabase".t(context) : "debug.clearObjectbox".t(context),
+                  ),
+                  leading: Symbols.adb_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  trailing: _debugDbBusy
+                      ? const SizedBox(
+                          width: 20.0,
+                          height: 20.0,
+                          child: Spinner.center(),
+                        )
+                      : null,
+                  onTap: () => resetDatabase(),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.clearSharedPreferences".t(context)),
+                  leading: Symbols.adb_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () => resetPrefs(),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.purgeICloudDebugFolder".t(context)),
+                  leading: Symbols.adb_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () => debugPurgeICloud(),
+                ),
+                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                PremiumListTile(
+                  title: Text("debug.jumpToSetupPage".t(context)),
+                  leading: Symbols.settings_rounded,
+                  accent: const Color(0xFF94A3B8),
+                  onTap: () => context.pushReplacement("/setup"),
+                ),
+              ],
             ),
           ],
           const SizedBox(height: 64.0),

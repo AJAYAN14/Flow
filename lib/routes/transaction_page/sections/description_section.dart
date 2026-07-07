@@ -54,7 +54,14 @@ class _DescriptionSectionState extends State<DescriptionSection> {
           ? ListTile(
               onTap: () => showEditModal(context),
               title: Text("transaction.description.add".t(context)),
-              leading: Icon(Symbols.add_notes_rounded),
+              leading: Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF06B6D4).withAlpha(0x26), // Cyan 500 15% opacity
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Symbols.add_notes_rounded, color: Color(0xFF06B6D4), size: 20.0),
+              ),
               trailing: const LeChevron(),
             )
           : InkWell(

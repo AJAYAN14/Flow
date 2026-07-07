@@ -39,6 +39,7 @@ class _CalendarTileState extends State<CalendarTile>
   @override
   Widget build(BuildContext context) {
     return BentoTile(
+      accent: const Color(0xFF8B5CF6), // Purple
       label: "tabs.stats.analytics.calendar".t(context),
       icon: Symbols.calendar_month_rounded,
       height: 158.0,

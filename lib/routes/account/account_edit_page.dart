@@ -28,6 +28,7 @@ import "package:flow/widgets/general/frame.dart";
 import "package:flow/widgets/general/info_text.dart";
 import "package:flow/widgets/general/money_text.dart";
 import "package:flow/widgets/general/wavy_divider.dart";
+import "package:flow/widgets/general/premium_list_tile.dart";
 import "package:flow/widgets/sheets/select_account_type_sheet.dart";
 import "package:flow/widgets/sheets/select_currency_sheet.dart";
 import "package:flow/widgets/sheets/select_flow_icon_sheet.dart";
@@ -149,33 +150,52 @@ class _AccountEditPageState extends State<AccountEditPage> {
             key: _formKey,
             child: Column(
               children: [
-                const SizedBox(height: 16.0),
-                FlowIcon(
-                  _iconData ?? FlowIconData.icon(Symbols.wallet_rounded),
-                  size: 96.0,
-                  plated: true,
-                  onTap: selectIcon,
+                const SizedBox(height: 24.0),
+                Container(
+                  padding: const EdgeInsets.all(24.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFFFF),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF3B82F6).withAlpha(0x1A), // 10% Blue shadow
+                        blurRadius: 24.0,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: FlowIcon(
+                    _iconData ?? FlowIconData.icon(Symbols.wallet_rounded),
+                    size: 64.0,
+                    color: const Color(0xFF3B82F6), // Blue 500
+                    onTap: selectIcon,
+                  ),
                 ),
                 const SizedBox(height: 24.0),
                 ConstrainedBox(
                   constraints: BoxConstraints.loose(
-                    Size(320.0, double.infinity),
+                    const Size(320.0, double.infinity),
                   ),
                   child: TextFormField(
                     controller: _nameTextController,
                     focusNode: _editNameFocusNode,
                     maxLength: Account.maxNameLength,
                     decoration: InputDecoration(
-                      focusColor: context.colorScheme.secondary,
                       counter: const SizedBox.shrink(),
                       hintText: "account.name".t(context),
                       hintStyle: context.textTheme.headlineMedium?.copyWith(
-                        color: context.textTheme.headlineMedium?.color
-                            ?.withAlpha(0x80),
+                        color: const Color(0xFF94A3B8), // Slate 400
+                        fontWeight: FontWeight.w700,
                       ),
-                      border: UnderlineInputBorder(),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
                     ),
-                    style: context.textTheme.headlineMedium,
+                    style: context.textTheme.headlineMedium?.copyWith(
+                      color: const Color(0xFF1E293B), // Slate 800
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
                     textAlign: TextAlign.center,
                     onTap: () => toggleEditName(true),
                     onFieldSubmitted: (_) => toggleEditName(false),
@@ -183,78 +203,92 @@ class _AccountEditPageState extends State<AccountEditPage> {
                     validator: validateNameField,
                   ),
                 ),
-                const SizedBox(height: 48.0),
-                InkWell(
-                  borderRadius: .circular(16.0),
-                  onTap: updateBalance,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: contentPadding,
-                          child: Text(
-                            Money(_balance, _currency).formatMoney(),
-                            style: context.textTheme.displayMedium,
-                          ),
-                        ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          "account.updateBalance".t(context),
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colorScheme.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
+                const SizedBox(height: 16.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFFFFF),
+                      borderRadius: BorderRadius.circular(24.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0F172A).withAlpha(0x0A),
+                          blurRadius: 16.0,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(24.0),
+                      onTap: updateBalance,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              Money(_balance, _currency).formatMoney(),
+                              style: context.textTheme.displayMedium?.copyWith(
+                                color: const Color(0xFF1E293B),
+                                fontWeight: FontWeight.w700,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              "account.updateBalance".t(context),
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: context.colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 48.0),
-                ListTile(
-                  leading: Icon(Symbols.attach_money_rounded),
-                  title: Text("currency".t(context)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(_currency, style: context.textTheme.labelLarge),
-                      if (widget.isNewAccount) ...[
-                        const SizedBox(width: 8.0),
-                        const LeChevron(),
-                      ],
-                    ],
-                  ),
-                  onTap: widget.isNewAccount ? selectCurrency : null,
-                ),
-                ListTile(
-                  leading: Icon(Symbols.category_rounded),
-                  title: Text("account.type".t(context)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
+                const SizedBox(height: 32.0),
+                PremiumListGroup(
+                  children: [
+                    PremiumListTile(
+                      leading: Symbols.attach_money_rounded,
+                      title: Text("currency".t(context)),
+                      accent: const Color(0xFF10B981), // Emerald
+                      trailing: Text(_currency, style: context.textTheme.labelLarge),
+                      onTap: widget.isNewAccount ? selectCurrency : null,
+                      showChevron: widget.isNewAccount,
+                    ),
+                    const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                    PremiumListTile(
+                      leading: Symbols.category_rounded,
+                      title: Text("account.type".t(context)),
+                      accent: const Color(0xFF3B82F6), // Blue
+                      trailing: Text(
                         _accountType.localizedNameContext(context),
                         style: context.textTheme.labelLarge,
                       ),
-                      const SizedBox(width: 8.0),
-                      const LeChevron(),
-                    ],
-                  ),
-                  onTap: selectAccountType,
-                ),
-                if (_accountType.showCreditLimit)
-                  ListTile(
-                    leading: Icon(Symbols.credit_card_rounded),
-                    title: Text("account.creditLimit".t(context)),
-                    trailing: MoneyText(
-                      Money(_creditLimit, _currency),
-                      style: context.textTheme.labelLarge,
+                      onTap: selectAccountType,
                     ),
-                    onTap: inputCreditLimit,
-                  ),
-
-                if (!_archived && _currentlyEditing?.uuid != null)
+                    if (_accountType.showCreditLimit) ...[
+                      const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                      PremiumListTile(
+                        leading: Symbols.credit_card_rounded,
+                        title: Text("account.creditLimit".t(context)),
+                        accent: const Color(0xFFF59E0B), // Amber
+                        trailing: MoneyText(
+                          Money(_creditLimit, _currency),
+                          style: context.textTheme.labelLarge,
+                        ),
+                        onTap: inputCreditLimit,
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 24.0),
+                if (!_archived && _currentlyEditing?.uuid != null) ...[
                   ValueListenableBuilder(
                     valueListenable: UserPreferencesService().valueNotifier,
                     builder: (context, value, _) {
@@ -264,50 +298,70 @@ class _AccountEditPageState extends State<AccountEditPage> {
                       if (isPrimary) {
                         return Column(
                           children: [
-                            ListTile(
-                              leading: Icon(Symbols.star_rounded),
-                              title: Text("account.primaryAccount".t(context)),
+                            PremiumListGroup(
+                              children: [
+                                PremiumListTile(
+                                  leading: Symbols.star_rounded,
+                                  title: Text("account.primaryAccount".t(context)),
+                                  accent: const Color(0xFFF59E0B),
+                                  showChevron: false,
+                                ),
+                              ],
                             ),
+                            const SizedBox(height: 8.0),
                             Frame(
                               child: InfoText(
-                                child: Text(
-                                  "account.primaryAccount.changeDescription".t(
-                                    context,
-                                  ),
-                                ),
+                                child: Text("account.primaryAccount.changeDescription".t(context)),
                               ),
                             ),
                           ],
                         );
                       }
 
-                      return SwitchListTile(
-                        secondary: Icon(Symbols.star_rounded),
-                        title: Text(
-                          "account.primaryAccount.notPrimary".t(context),
-                        ),
-                        selected: false,
-                        value: false,
-                        onChanged: (_) => setAsPrimaryAccount(),
+                      return PremiumListGroup(
+                        children: [
+                          PremiumListTile(
+                            leading: Symbols.star_rounded,
+                            title: Text("account.primaryAccount.notPrimary".t(context)),
+                            accent: const Color(0xFF94A3B8),
+                            showChevron: false,
+                            onTap: () => setAsPrimaryAccount(),
+                          ),
+                        ],
                       );
                     },
                   ),
-                const SizedBox(height: 24.0),
-                const WavyDivider(),
-                const SizedBox(height: 24.0),
-                SwitchListTile(
-                  secondary: Icon(Symbols.playlist_remove_rounded),
-                  value: _excludeFromTotalBalance,
-                  onChanged: updateBalanceExclusion,
-                  title: Text("account.excludeFromTotalBalance".t(context)),
+                  const SizedBox(height: 24.0),
+                ],
+                PremiumListGroup(
+                  children: [
+                    PremiumListTile(
+                      leading: Symbols.playlist_remove_rounded,
+                      title: Text("account.excludeFromTotalBalance".t(context)),
+                      accent: const Color(0xFF8B5CF6), // Purple
+                      showChevron: false,
+                      trailing: Switch(
+                        value: _excludeFromTotalBalance,
+                        onChanged: updateBalanceExclusion,
+                        activeColor: const Color(0xFF8B5CF6),
+                      ),
+                    ),
+                    if (!widget.isNewAccount) ...[
+                      const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                      PremiumListTile(
+                        leading: Symbols.block_rounded,
+                        title: Text("account.archive".t(context)),
+                        accent: const Color(0xFFEF4444), // Red
+                        showChevron: false,
+                        trailing: Switch(
+                          value: _archived,
+                          onChanged: updateArchived,
+                          activeColor: const Color(0xFFEF4444),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                if (!widget.isNewAccount)
-                  SwitchListTile(
-                    secondary: const Icon(Symbols.block_rounded, fill: 0.0),
-                    value: _archived,
-                    onChanged: updateArchived,
-                    title: Text("account.archive".t(context)),
-                  ),
                 if (!widget.isNewAccount) ...[
                   const SizedBox(height: 8.0),
                   Frame(
@@ -317,13 +371,13 @@ class _AccountEditPageState extends State<AccountEditPage> {
                   ),
                 ],
                 if (_currentlyEditing != null && _archived) ...[
-                  const SizedBox(height: 80.0),
+                  const SizedBox(height: 48.0),
                   DeleteButton(
                     onTap: _deleteAccount,
                     label: Text("account.delete".t(context)),
                   ),
-                  const SizedBox(height: 16.0),
                 ],
+                const SizedBox(height: 32.0),
               ],
             ),
           ),

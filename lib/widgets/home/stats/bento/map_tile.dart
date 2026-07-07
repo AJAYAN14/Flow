@@ -38,6 +38,7 @@ class _MapTileState extends State<MapTile>
     final bool hasData = locatedCount > 0;
 
     return BentoTile(
+      accent: const Color(0xFF14B8A6), // Teal
       label: "tabs.stats.analytics.spendingMap".t(context),
       icon: Symbols.map_rounded,
       height: 158.0,

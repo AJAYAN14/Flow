@@ -48,6 +48,7 @@ class _TopCategoriesTileState extends State<TopCategoriesTile>
   @override
   Widget build(BuildContext context) {
     return BentoTile(
+      accent: const Color(0xFFF43F5E), // Rose
       label: "tabs.stats.analytics.topCategories".t(context),
       icon: Symbols.donut_small_rounded,
       height: 158.0,

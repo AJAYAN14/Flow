@@ -67,14 +67,21 @@ class _TotalBalanceState extends State<TotalBalance> {
             children: [
               Text(
                 "tabs.home.totalBalance".t(context),
-                style: context.textTheme.bodyLarge,
+                style: context.textTheme.titleMedium?.copyWith(
+                  color: const Color(0xFF64748B), // Slate 500
+                  fontWeight: FontWeight.w600,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Flexible(
                 child: MoneyText(
                   value,
-                  style: context.textTheme.displayMedium,
+                  style: context.textTheme.displayMedium?.copyWith(
+                    color: const Color(0xFF0F172A), // Slate 900
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -1.0,
+                  ),
                   initiallyAbbreviated: initiallyAbbreviated,
                   tapToToggleAbbreviation: true,
                 ),

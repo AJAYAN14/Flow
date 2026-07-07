@@ -50,9 +50,9 @@ class _PaceTileState extends State<PaceTile>
             report.expenseSum.amount.abs() <= 0);
 
     return BentoTile(
+      accent: const Color(0xFFF59E0B), // Amber
       label: "tabs.stats.analytics.pace".t(context),
       icon: Symbols.speed_rounded,
-      accent: context.flowColors.expense,
       height: 160.0,
       busy: busy && !loaded,
       onTap: () => context.push("/stats/cash-flow"),

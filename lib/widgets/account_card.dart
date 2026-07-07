@@ -55,107 +55,161 @@ class AccountCard extends StatelessWidget {
             .map((transaction) => transaction.money),
       );
 
-    final child = Surface(
-      shape: RoundedRectangleBorder(borderRadius: borderRadius),
-      builder: (context) => InkWell(
-        onTap: onTapOverride == null
-            ? () => context.push("/account/${account.id}")
-            : onTapOverride!.value,
+    final child = Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFFFF),
         borderRadius: borderRadius,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: .start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  FlowIcon(
-                    account.icon,
-                    size: 60.0,
-                    colorScheme: account.colorScheme,
-                  ),
-                  const SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: .start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            if (primary)
-                              WidgetSpan(
-                                alignment: .middle,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 4.0),
-                                  child: Icon(
-                                    Symbols.star_rounded,
-                                    size:
-                                        context.textTheme.titleSmall?.fontSize,
-                                    color: context.colorScheme.primary,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withAlpha(0x0A),
+            blurRadius: 24.0,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTapOverride == null
+              ? () => context.push("/account/${account.id}")
+              : onTapOverride!.value,
+          borderRadius: borderRadius,
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: (account.colorScheme.name == "monochrome" 
+                            ? const Color(0xFF2563EB) 
+                            : account.colorScheme.primary).withAlpha(0x1A),
+                        shape: BoxShape.circle,
+                      ),
+                      child: FlowIcon(
+                        account.icon,
+                        size: 32.0,
+                        color: account.colorScheme.name == "monochrome" 
+                            ? const Color(0xFF2563EB) 
+                            : account.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 16.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                if (primary)
+                                  const WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(right: 6.0),
+                                      child: Icon(
+                                        Symbols.star_rounded,
+                                        size: 16.0,
+                                        color: Color(0xFFF59E0B),
+                                      ),
+                                    ),
                                   ),
+                                TextSpan(
+                                  text:
+                                      account.name +
+                                      (account.archived
+                                          ? " (${"account.archived".t(context)})"
+                                          : ""),
                                 ),
+                              ],
+                              style: context.textTheme.titleMedium?.copyWith(
+                                color: const Color(0xFF64748B), // Slate 500
+                                fontWeight: FontWeight.w600,
                               ),
-                            TextSpan(
-                              text:
-                                  account.name +
-                                  (account.archived
-                                      ? " (${"account.archived".t(context)})"
-                                      : ""),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4.0),
+                          MoneyText(
+                            account.balance,
+                            style: context.textTheme.headlineMedium?.copyWith(
+                              color: const Color(0xFF1E293B), // Slate 800
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                if (!account.archived) ...[
+                  const SizedBox(height: 24.0),
+                  Text(
+                    "account.thisMonth".t(context),
+                    style: context.textTheme.labelMedium?.copyWith(
+                      color: const Color(0xFF94A3B8), // Slate 400
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              TransactionType.income.localizedNameContext(context),
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: const Color(0xFF10B981), // Emerald 500
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4.0),
+                            MoneyText(
+                              flow.getIncomeByCurrency(account.currency),
+                              style: context.textTheme.titleMedium?.copyWith(
+                                color: const Color(0xFF334155), // Slate 700
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ],
-                          style: context.textTheme.titleSmall,
                         ),
                       ),
-
-                      MoneyText(
-                        account.balance,
-                        style: context.textTheme.displaySmall,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              TransactionType.expense.localizedNameContext(context),
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: const Color(0xFFF43F5E), // Rose 500
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4.0),
+                            MoneyText(
+                              flow.getExpenseByCurrency(account.currency),
+                              style: context.textTheme.titleMedium?.copyWith(
+                                color: const Color(0xFF334155), // Slate 700
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ],
-              ),
-              if (!account.archived) ...[
-                const SizedBox(height: 16.0),
-                Text(
-                  "account.thisMonth".t(context),
-                  style: context.textTheme.bodyLarge,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        TransactionType.income.localizedNameContext(context),
-                        style: context.textTheme.labelSmall?.semi(context),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        TransactionType.expense.localizedNameContext(context),
-                        style: context.textTheme.labelSmall?.semi(context),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: MoneyText(
-                        flow.getIncomeByCurrency(account.currency),
-                        style: context.textTheme.bodyLarge,
-                      ),
-                    ),
-                    Expanded(
-                      child: MoneyText(
-                        flow.getExpenseByCurrency(account.currency),
-                        style: context.textTheme.bodyLarge,
-                      ),
-                    ),
-                  ],
-                ),
               ],
-            ],
+            ),
           ),
         ),
       ),

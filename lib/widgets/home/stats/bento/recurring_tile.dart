@@ -35,6 +35,7 @@ class _RecurringTileState extends State<RecurringTile>
   @override
   Widget build(BuildContext context) {
     return BentoTile(
+      accent: const Color(0xFF06B6D4), // Cyan
       label: "tabs.stats.analytics.recurring".t(context),
       icon: Symbols.autorenew_rounded,
       height: 158.0,

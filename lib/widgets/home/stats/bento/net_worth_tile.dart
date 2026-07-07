@@ -40,6 +40,7 @@ class _NetWorthTileState extends State<NetWorthTile>
     final double firstAmount = samples.isEmpty ? 0.0 : samples.first;
 
     return BentoTile(
+      accent: const Color(0xFF6366F1), // Indigo
       label: "tabs.stats.analytics.netWorth".t(context),
       icon: Symbols.trending_up_rounded,
       height: 188.0,

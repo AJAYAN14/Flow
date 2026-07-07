@@ -59,6 +59,48 @@ Future<TimeRange?> showTimeRangePickerSheet(
         initialDateRange: initialValue is CustomTimeRange
             ? DateTimeRange(start: initialValue.from, end: initialValue.to)
             : null,
+        builder: (context, child) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: Theme.of(context).colorScheme.copyWith(
+                    primary: const Color(0xFF2563EB), // Royal Blue
+                    onPrimary: Colors.white,
+                    surface: Colors.white,
+                    onSurface: const Color(0xFF1E293B), // Slate 800
+                  ),
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                foregroundColor: Color(0xFF1E293B), // Slate 800
+                elevation: 0,
+              ),
+              datePickerTheme: DatePickerThemeData(
+                backgroundColor: Colors.white,
+                headerBackgroundColor: Colors.white,
+                headerForegroundColor: const Color(0xFF1E293B), // Slate 800
+                rangeSelectionOverlayColor: MaterialStateProperty.all(
+                  const Color(0xFFDBEAFE), // Blue 100 (Brighter and more vibrant)
+                ),
+                rangeSelectionBackgroundColor: const Color(0xFFDBEAFE), // Blue 100
+                todayForegroundColor: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.selected)) return Colors.white;
+                  return const Color(0xFF2563EB); // Royal Blue for today's text
+                }),
+                dayStyle: const TextStyle(fontWeight: FontWeight.w600),
+                yearStyle: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF2563EB), // Royal Blue
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+            ),
+            child: child!,
+          );
+        },
       ).then(
         (value) => value == null
             ? null

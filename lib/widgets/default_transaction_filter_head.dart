@@ -155,6 +155,7 @@ class _DefaultTransactionsFilterHeadState
               TransactionFilterChip<TransactionSearchData>(
                 translationKey: "transactions.query.filter.keyword",
                 avatar: const Icon(Symbols.search_rounded),
+                iconColor: const Color(0xFF6366F1), // Indigo
                 onSelect: onSearch,
                 defaultValue: widget.defaultFilter.searchData,
                 value: _filter.searchData,
@@ -163,6 +164,7 @@ class _DefaultTransactionsFilterHeadState
               TransactionFilterChip<TransactionFilterTimeRange>(
                 translationKey: "transactions.query.filter.timeRange",
                 avatar: const Icon(Symbols.history_rounded),
+                iconColor: const Color(0xFF8B5CF6), // Purple
                 onSelect: onSelectRange,
                 defaultValue: widget.defaultFilter.range,
                 value: _filter.range,
@@ -171,6 +173,7 @@ class _DefaultTransactionsFilterHeadState
                 TransactionFilterChip<Set<Account>>(
                   translationKey: "transactions.query.filter.accounts",
                   avatar: const Icon(Symbols.wallet_rounded),
+                  iconColor: const Color(0xFFF59E0B), // Amber
                   onSelect: onSelectAccounts,
                   defaultValue: widget.defaultFilter.accounts
                       ?.mappedFilter(activeAccounts, (account) => account.uuid)
@@ -187,6 +190,7 @@ class _DefaultTransactionsFilterHeadState
                 TransactionFilterChip<Set<Category>>(
                   translationKey: "transactions.query.filter.categories",
                   avatar: const Icon(Symbols.category_rounded),
+                  iconColor: const Color(0xFF10B981), // Emerald
                   onSelect: onSelectCategories,
                   defaultValue: widget.defaultFilter.categories
                       ?.mappedFilter(categories, (category) => category.uuid)
@@ -199,6 +203,7 @@ class _DefaultTransactionsFilterHeadState
                 TransactionFilterChip<Set<TransactionTag>>(
                   translationKey: "transactions.query.filter.tags",
                   avatar: const Icon(Symbols.style_rounded),
+                  iconColor: const Color(0xFFEC4899), // Pink
                   onSelect: onSelectTags,
                   defaultValue: widget.defaultFilter.tags
                       ?.mappedFilter(tags, (tag) => tag.uuid)
@@ -210,6 +215,7 @@ class _DefaultTransactionsFilterHeadState
               TransactionFilterChip<bool?>(
                 translationKey: "transactions.query.filter.hasAttachments",
                 avatar: const Icon(Symbols.attach_file_rounded),
+                iconColor: const Color(0xFF64748B), // Slate
                 onSelect: onSelectHasAttachments,
                 defaultValue: null,
                 value: _filter.hasAttachments,
@@ -217,6 +223,7 @@ class _DefaultTransactionsFilterHeadState
               TransactionFilterChip<bool?>(
                 translationKey: "transactions.query.filter.isPending",
                 avatar: const Icon(Symbols.search_activity_rounded),
+                iconColor: const Color(0xFFF43F5E), // Rose
                 onSelect: onSelectIsPending,
                 defaultValue: null,
                 value: _filter.isPending,
@@ -224,6 +231,7 @@ class _DefaultTransactionsFilterHeadState
               TransactionFilterChip<List<TransactionType>>(
                 translationKey: "transactions.query.filter.transactionType",
                 avatar: const Icon(Symbols.swap_horiz_rounded),
+                iconColor: const Color(0xFF06B6D4), // Cyan
                 onSelect: onSelectType,
                 defaultValue: null,
                 value: _filter.types?.isNotEmpty == true
@@ -234,6 +242,7 @@ class _DefaultTransactionsFilterHeadState
                 TransactionFilterChip<List<String>>(
                   translationKey: "transactions.query.filter.currency",
                   avatar: const Icon(Symbols.universal_currency_alt_rounded),
+                  iconColor: const Color(0xFFEAB308), // Yellow
                   onSelect: onSelectCurrency,
                   defaultValue: widget.defaultFilter.currencies,
                   value: _filter.currencies?.isNotEmpty == true
@@ -243,6 +252,7 @@ class _DefaultTransactionsFilterHeadState
               TransactionFilterChip<TransactionGroupRange>(
                 translationKey: "transactions.query.filter.groupBy",
                 avatar: const Icon(Symbols.atr_rounded),
+                iconColor: const Color(0xFF8B5CF6), // Purple
                 onSelect: onSelectGroupBy,
                 defaultValue: widget.defaultFilter.groupBy,
                 value: _filter.groupBy,

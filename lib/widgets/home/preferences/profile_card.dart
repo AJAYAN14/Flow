@@ -46,7 +46,10 @@ class ProfileCard extends StatelessWidget {
                 const SizedBox(height: 8.0),
                 Text(
                   profile?.name ?? "unnamed",
-                  style: context.textTheme.headlineSmall,
+                  style: context.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1E293B), // Slate 800
+                  ),
                 ),
               ],
             ),

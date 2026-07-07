@@ -1,4 +1,5 @@
 import "package:flow/l10n/flow_localizations.dart";
+import "package:flow/theme/theme.dart";
 import "package:flow/widgets/general/button.dart";
 import "package:flow/widgets/general/modal_overflow_bar.dart";
 import "package:flow/widgets/general/modal_sheet.dart";
@@ -33,19 +34,58 @@ class _MonthSelectorSheetState extends State<MonthSelectorSheet> {
   Widget build(BuildContext context) {
     return ModalSheet(
       title: Text("select.time.select.month".t(context)),
-      trailing: ModalOverflowBar(
-        alignment: .end,
-        children: [
-          TextButton(
-            onPressed: () => setState(() {
-              final DateTime now = DateTime.now();
-              year = now.year;
-              month = now.month;
-            }),
-            child: Text("select.time.now".t(context)),
-          ),
-          Button(onTap: pop, child: Text("general.done".t(context))),
-        ],
+      trailing: Container(
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: FilledButton(
+                onPressed: () => setState(() {
+                  final DateTime now = DateTime.now();
+                  year = now.year;
+                  month = now.month;
+                }),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFF1F5F9), // Slate 100
+                  foregroundColor: const Color(0xFF475569), // Slate 600
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                ),
+                child: Text(
+                  "select.time.now".t(context),
+                  style: context.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12.0),
+            Expanded(
+              flex: 2,
+              child: FilledButton(
+                onPressed: pop,
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB), // Royal Blue
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                ),
+                child: Text(
+                  "general.done".t(context),
+                  style: context.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

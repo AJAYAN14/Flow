@@ -269,6 +269,17 @@ class _TransactionPageState extends State<TransactionPage> {
     super.dispose();
   }
 
+  Widget _buildPremiumIcon(IconData icon, Color accent) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: accent.withAlpha(0x26), // 15% opacity
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: accent, size: 20.0),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String primaryCurrency = UserPreferencesService().primaryCurrency;
@@ -335,117 +346,113 @@ class _TransactionPageState extends State<TransactionPage> {
                         fallbackTitle: fallbackTitle,
                         onSubmitted: (_) => save(),
                       ),
-                      Center(
-                        child: InkWell(
-                          onTap: inputAmount,
-                          child: Center(
-                            child: Text(
-                              Money(
-                                _amount,
-                                _selectedAccount?.currency ?? primaryCurrency,
-                              ).formatMoney(),
-                              style: context.textTheme.displayMedium,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // From account
-                      Section(
-                        title: isTransfer
-                            ? "transaction.transfer.from".t(context)
-                            : "account".t(context),
-                        child: ListTile(
-                          leading: _selectedAccount == null
-                              ? null
-                              : FlowIcon(_selectedAccount!.icon, plated: true),
-                          title: Text(
-                            _selectedAccount?.name ??
-                                "transaction.edit.selectAccount".t(context),
-                          ),
-                          subtitle:
-                              (!widget.isNewTransaction &&
-                                  _selectedAccount != null)
-                              ? MoneyText(
-                                  _selectedAccount!.balanceAt(transactionDate),
-                                )
-                              : null,
-                          onTap: () => selectAccount(),
-                          trailing: _selectedAccount == null
-                              ? const Icon(Symbols.chevron_right)
-                              : null,
-                          focusNode: _selectAccountFocusNode,
-                        ),
-                      ),
-                      // To account
-                      if (isTransfer) ...[
-                        Section(
-                          title: "transaction.transfer.to".t(context),
-                          child: ListTile(
-                            leading: _selectedAccountTransferTo == null
-                                ? null
-                                : FlowIcon(
-                                    _selectedAccountTransferTo!.icon,
-                                    plated: true,
-                                  ),
-                            title: Text(
-                              _selectedAccountTransferTo?.name ??
-                                  "transaction.edit.selectAccount".t(context),
-                            ),
-                            subtitle:
-                                (!widget.isNewTransaction &&
-                                    _selectedAccountTransferTo != null)
-                                ? MoneyText(
-                                    _selectedAccountTransferTo!.balanceAt(
-                                      transactionDate,
-                                    ),
-                                  )
-                                : null,
-                            onTap: () => selectAccountTransferTo(),
-                            trailing: _selectedAccountTransferTo == null
-                                ? const Icon(Symbols.chevron_right)
-                                : null,
-                            focusNode: _selectAccountTransferToFocusNode,
-                          ),
-                        ),
-                        if (crossCurrencyTransfer)
-                          Section(
-                            title: "transaction.transfer.conversionRate".t(
-                              context,
-                            ),
-                            child: ListTile(
-                              title: Text(
-                                "${Money(1.0, _selectedAccount!.currency).formatMoney()} = ${Money(_conversionRate, _selectedAccountTransferTo!.currency).formatMoney()}",
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: context.colorScheme.brightness == Brightness.light ? const Color(0xFFFFFFFF) : context.colorScheme.secondary,
+                            borderRadius: BorderRadius.circular(28.0),
+                            boxShadow: context.colorScheme.brightness == Brightness.light ? [
+                              BoxShadow(
+                                color: const Color(0xFF0F172A).withAlpha(0x0A), // Slate 900 4%
+                                blurRadius: 16.0,
+                                offset: const Offset(0, 4),
                               ),
-                              onTap: () => inputPostConversionAmount(),
-                              trailing: _selectedAccountTransferTo == null
-                                  ? LeChevron()
-                                  : null,
-                              focusNode: _selectAccountTransferToFocusNode,
-                            ),
+                            ] : null,
                           ),
-                      ],
-                      // Category
-                      if (!isTransfer)
-                        Section(
-                          title: "category".t(context),
-                          child: ListTile(
-                            leading: _selectedCategory == null
-                                ? null
-                                : FlowIcon(
-                                    _selectedCategory!.icon,
-                                    plated: true,
-                                    colorScheme: _selectedCategory!.colorScheme,
+                          clipBehavior: Clip.antiAlias,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: inputAmount,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 16.0),
+                                child: Center(
+                                  child: Text(
+                                    Money(
+                                      _amount,
+                                      _selectedAccount?.currency ?? primaryCurrency,
+                                    ).formatMoney(),
+                                    style: context.textTheme.displayLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: context.colorScheme.brightness == Brightness.light 
+                                        ? const Color(0xFF2563EB) // Royal Blue
+                                        : context.colorScheme.primary,
+                                    ),
                                   ),
-                            title: Text(
-                              _selectedCategory?.name ??
-                                  "transaction.edit.selectCategory".t(context),
+                                ),
+                              ),
                             ),
-                            onTap: () => selectCategory(),
-                            trailing: _selectedCategory == null
-                                ? const Icon(Symbols.chevron_right)
-                                : null,
                           ),
                         ),
+                      ),
+                      Section(
+                        title: isTransfer ? "transaction.transfer".t(context) : "transaction.details".t(context),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              leading: _selectedAccount == null
+                                  ? _buildPremiumIcon(Symbols.account_balance_wallet_rounded, const Color(0xFF10B981)) // Emerald
+                                  : FlowIcon(_selectedAccount!.icon, plated: true),
+                              title: Text(
+                                _selectedAccount?.name ?? "transaction.edit.selectAccount".t(context),
+                              ),
+                              subtitle: (!widget.isNewTransaction && _selectedAccount != null)
+                                  ? MoneyText(_selectedAccount!.balanceAt(transactionDate))
+                                  : null,
+                              onTap: () => selectAccount(),
+                              trailing: _selectedAccount == null ? const Icon(Symbols.chevron_right) : null,
+                              focusNode: _selectAccountFocusNode,
+                            ),
+                            if (isTransfer) ...[
+                              const Divider(indent: 56.0, height: 1.0),
+                              ListTile(
+                                leading: _selectedAccountTransferTo == null
+                                    ? _buildPremiumIcon(Symbols.account_balance_wallet_rounded, const Color(0xFF10B981)) // Emerald
+                                    : FlowIcon(_selectedAccountTransferTo!.icon, plated: true),
+                                title: Text(
+                                  _selectedAccountTransferTo?.name ?? "transaction.edit.selectAccount".t(context),
+                                ),
+                                subtitle: (!widget.isNewTransaction && _selectedAccountTransferTo != null)
+                                    ? MoneyText(_selectedAccountTransferTo!.balanceAt(transactionDate))
+                                    : null,
+                                onTap: () => selectAccountTransferTo(),
+                                trailing: _selectedAccountTransferTo == null ? const Icon(Symbols.chevron_right) : null,
+                                focusNode: _selectAccountTransferToFocusNode,
+                              ),
+                              if (crossCurrencyTransfer) ...[
+                                const Divider(indent: 56.0, height: 1.0),
+                                ListTile(
+                                  leading: _buildPremiumIcon(Symbols.currency_exchange_rounded, const Color(0xFFF43F5E)),
+                                  title: Text(
+                                    "${Money(1.0, _selectedAccount!.currency).formatMoney()} = ${Money(_conversionRate, _selectedAccountTransferTo!.currency).formatMoney()}",
+                                  ),
+                                  onTap: () => inputPostConversionAmount(),
+                                  trailing: const LeChevron(),
+                                ),
+                              ],
+                            ],
+                            if (!isTransfer) ...[
+                              const Divider(indent: 56.0, height: 1.0),
+                              ListTile(
+                                  leading: _selectedCategory == null
+                                    ? _buildPremiumIcon(Symbols.category_rounded, const Color(0xFFEAB308))
+                                    : FlowIcon(
+                                        _selectedCategory!.icon,
+                                        plated: true,
+                                        colorScheme: _selectedCategory!.colorScheme,
+                                      ),
+                                title: Text(
+                                  _selectedCategory?.name ?? "transaction.edit.selectCategory".t(context),
+                                ),
+                                onTap: () => selectCategory(),
+                                trailing: _selectedCategory == null ? const Icon(Symbols.chevron_right) : null,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                       TagsSection(
                         selectTags: selectTags,
                         selectedTags: _selectedTags,
@@ -468,50 +475,43 @@ class _TransactionPageState extends State<TransactionPage> {
                         onRemove: removeFile,
                         attachments: _attachments,
                       ),
-                      if (_recurrence == null || !widget.isNewTransaction)
-                        Section(
-                          title: "transaction.date".t(context),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
+                      Section(
+                        title: "transaction.date".t(context),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_recurrence == null || !widget.isNewTransaction) ...[
                               ListTile(
                                 title: Text(transactionDate.toMoment().LLL),
                                 onTap: () => selectTransactionDate(),
-                                leading: Icon(Symbols.calendar_month_rounded),
+                                leading: _buildPremiumIcon(Symbols.calendar_month_rounded, const Color(0xFF2563EB)),
                                 trailing: const LeChevron(),
                               ),
+                              const Divider(indent: 56.0, height: 1.0),
                               SwitchListTile(
                                 title: Text("transaction.pending".t(context)),
-                                secondary: Icon(
-                                  Symbols.search_activity_rounded,
-                                ),
+                                secondary: _buildPremiumIcon(Symbols.search_activity_rounded, const Color(0xFFF59E0B)),
                                 value: _isPending,
-                                onChanged: pastDuePending
-                                    ? null
-                                    : updatePending,
+                                onChanged: pastDuePending ? null : updatePending,
                               ),
+                              const Divider(indent: 56.0, height: 1.0),
                             ],
-                          ),
-                        ),
-
-                      Section(
-                        title: "transaction.recurring".t(context),
-                        child: AnimatedSize(
-                          duration: const Duration(milliseconds: 300),
-                          child: _recurrence != null
-                              ? SelectRecurrence(
-                                  initialValue: _recurrence,
-                                  onChanged: updateRecurrence,
-                                  startBounds: startBounds,
-                                )
-                              : ListTile(
-                                  leading: Icon(Symbols.repeat_rounded),
-                                  title: Text(
-                                    "transaction.recurring.setup".t(context),
-                                  ),
-                                  onTap: _setupRecurring,
-                                  trailing: const LeChevron(),
-                                ),
+                            AnimatedSize(
+                              duration: const Duration(milliseconds: 300),
+                              child: _recurrence != null
+                                  ? SelectRecurrence(
+                                      initialValue: _recurrence,
+                                      onChanged: updateRecurrence,
+                                      startBounds: startBounds,
+                                    )
+                                  : ListTile(
+                                      leading: _buildPremiumIcon(Symbols.repeat_rounded, const Color(0xFF8B5CF6)),
+                                      title: Text("transaction.recurring.setup".t(context)),
+                                      onTap: _setupRecurring,
+                                      trailing: const LeChevron(),
+                                    ),
+                            ),
+                          ],
                         ),
                       ),
 

@@ -52,6 +52,7 @@ class _CashFlowTileState extends State<CashFlowTile>
         : context.flowColors.expense;
 
     return BentoTile(
+      accent: const Color(0xFF10B981), // Emerald
       label: "tabs.stats.analytics.cashFlow".t(context),
       icon: Symbols.swap_vert_rounded,
       height: 160.0,

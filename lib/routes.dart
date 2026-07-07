@@ -57,6 +57,7 @@ import "package:flow/routes/stats/spending_calendar_page.dart";
 import "package:flow/routes/stats/spending_map_page.dart";
 import "package:flow/routes/stats/stats_by_group_page.dart";
 import "package:flow/routes/stats/wrapped_page.dart";
+import "package:flow/routes/splash_screen.dart";
 import "package:flow/routes/support_page.dart";
 import "package:flow/routes/transaction_batch_import_page.dart";
 import "package:flow/routes/transaction_page.dart";
@@ -77,10 +78,19 @@ import "package:moment_dart/moment_dart.dart";
 final GlobalKey<NavigatorState> globalNavigatorKey =
     GlobalKey<NavigatorState>();
 
+bool splashFinished = false;
+
 final GoRouter router = GoRouter(
   navigatorKey: globalNavigatorKey,
+  redirect: (context, state) {
+    if (!splashFinished && state.uri.path != "/splash") {
+      return "/splash?target=${Uri.encodeComponent(state.uri.toString())}";
+    }
+    return null;
+  },
   errorBuilder: (context, state) => ErrorPage(error: state.error?.toString()),
   routes: [
+    GoRoute(path: "/splash", builder: (context, state) => const SplashScreen()),
     GoRoute(path: "/", builder: (context, state) => const HomePage()),
     GoRoute(
       path: "/transaction/new",

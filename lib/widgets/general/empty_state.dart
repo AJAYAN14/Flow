@@ -30,19 +30,31 @@ class EmptyState extends StatelessWidget {
           children: [
             ?leading,
             if (icon != null)
-              FlowIcon(icon!, size: 96.0, color: context.colorScheme.primary),
+              Container(
+                padding: const EdgeInsets.all(24.0),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEFF6FF), // Blue 50
+                  shape: BoxShape.circle,
+                ),
+                child: FlowIcon(icon!, size: 64.0, color: const Color(0xFF3B82F6)), // Blue 500
+              ),
             if (title != null)
               DefaultTextStyle(
                 textAlign: TextAlign.center,
-                style: context.textTheme.headlineMedium!,
+                style: context.textTheme.titleLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1E293B), // Slate 800
+                ),
                 child: title!,
               ),
             if (subtitle != null)
               Padding(
-                padding: const .symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: DefaultTextStyle(
                   textAlign: TextAlign.center,
-                  style: context.textTheme.bodyMedium!,
+                  style: context.textTheme.bodyMedium!.copyWith(
+                    color: const Color(0xFF64748B), // Slate 500
+                  ),
                   child: subtitle!,
                 ),
               ),

@@ -47,23 +47,50 @@ class _WrappedTileState extends State<WrappedTile>
                 ).formattedCompact,
               });
 
-    return Surface(
-      builder: (context) => InkWell(
-        borderRadius: .all(Radius.circular(16.0)),
-        onTap: () => context.push("/stats/wrapped"),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: .all(Radius.circular(16.0)),
-            gradient: LinearGradient(
-              begin: AlignmentDirectional.centerStart,
-              end: AlignmentDirectional.centerEnd,
-              colors: [accent.withAlpha(0x2e), accent.withAlpha(0x08)],
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFFFF),
+        borderRadius: const BorderRadius.all(Radius.circular(24.0)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withAlpha(0x0A),
+            blurRadius: 16.0,
+            offset: const Offset(0, 4),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
-          child: Row(
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: const BorderRadius.all(Radius.circular(24.0)),
+          onTap: () => context.push("/stats/wrapped"),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(24.0)),
+              gradient: const LinearGradient(
+                begin: AlignmentDirectional.centerStart,
+                end: AlignmentDirectional.centerEnd,
+                colors: [
+                  Color(0xFFFFFBEB), // Very pale golden amber (Amber 50)
+                  Color(0x00FFFFFF), // Fades to transparent white
+                ],
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+            child: Row(
             children: [
-              Icon(Symbols.auto_awesome_rounded, color: accent, size: 22.0),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF59E0B).withAlpha(0x26), // Amber 15% opacity
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Symbols.auto_awesome_rounded, 
+                  color: Color(0xFFF59E0B), // Golden Amber
+                  size: 20.0,
+                ),
+              ),
               const SizedBox(width: 12.0),
               Expanded(
                 child: Column(
@@ -94,6 +121,7 @@ class _WrappedTileState extends State<WrappedTile>
             ],
           ),
         ),
+      ),
       ),
     );
   }

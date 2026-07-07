@@ -45,51 +45,72 @@ class BentoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color resolvedAccent = accent ?? context.colorScheme.primary;
 
-    return Surface(
-      builder: (context) => InkWell(
-        borderRadius: .all(Radius.circular(16.0)),
-        onTap: onTap,
-        child: SizedBox(
-          height: height,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: .start,
-              children: [
-                Row(
-                  children: [
-                    Icon(icon, color: resolvedAccent, size: 18.0),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: Text(
-                        label.toUpperCase(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.labelSmall?.copyWith(
-                          color: context.flowColors.semi,
-                          letterSpacing: 0.6,
-                          fontWeight: FontWeight.w600,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFFFF),
+        borderRadius: BorderRadius.circular(24.0),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withAlpha(0x0A),
+            blurRadius: 16.0,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: const BorderRadius.all(Radius.circular(24.0)),
+          onTap: onTap,
+          child: SizedBox(
+            height: height,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6.0),
+                        decoration: BoxDecoration(
+                          color: resolvedAccent.withAlpha(0x26), // 15% opacity for a nice pop
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(icon, color: resolvedAccent, size: 16.0),
+                      ),
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: Text(
+                          label.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.textTheme.labelSmall?.copyWith(
+                            color: const Color(0xFF64748B), // Slate 500
+                            letterSpacing: 0.6,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    if (onTap != null)
-                      Icon(
-                        Symbols.chevron_right_rounded,
-                        size: 18.0,
-                        color: context.flowColors.semi,
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 10.0),
-                Expanded(
-                  child: busy
-                      ? const Spinner.center()
-                      : Align(
-                          alignment: AlignmentDirectional.topStart,
-                          child: child,
+                      if (onTap != null)
+                        const Icon(
+                          Symbols.chevron_right_rounded,
+                          size: 18.0,
+                          color: Color(0xFF94A3B8), // Slate 400
                         ),
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 10.0),
+                  Expanded(
+                    child: busy
+                        ? const Spinner.center()
+                        : Align(
+                            alignment: AlignmentDirectional.topStart,
+                            child: child,
+                          ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
