@@ -95,25 +95,7 @@ class _ProfileTabState extends State<ProfileTab> {
               ),
             ],
           ),
-          const SizedBox(height: 32.0),
-          ListHeader("tabs.profile.community".t(context), padding: const EdgeInsets.symmetric(horizontal: 24.0)),
-          PremiumListGroup(
-            children: [
-              PremiumListTile(
-                title: Text("tabs.profile.support".t(context)),
-                leading: Symbols.favorite_rounded,
-                accent: const Color(0xFFEC4899), // Pink
-                onTap: () => context.push("/support"),
-              ),
-              const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
-              PremiumListTile(
-                title: Text("tabs.profile.recommend".t(context)),
-                leading: Symbols.share_rounded,
-                accent: const Color(0xFF6366F1), // Indigo
-                onTap: () => context.showUriShareSheet(uri: website),
-              ),
-            ],
-          ),
+
           const SizedBox(height: 32.0),
           ListHeader("tabs.profile.other".t(context), padding: const EdgeInsets.symmetric(horizontal: 24.0)),
           PremiumListGroup(

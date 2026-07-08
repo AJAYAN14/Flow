@@ -1,5 +1,6 @@
 import "package:flow/entity/category.dart";
 import "package:flow/l10n/extensions.dart";
+import "package:flow/theme/theme.dart";
 import "package:flow/utils/optional.dart";
 import "package:flow/utils/simple_query_sorter.dart";
 import "package:flow/widgets/general/flow_icon.dart";
@@ -69,49 +70,78 @@ class _SelectMultiCategorySheetState extends State<SelectMultiCategorySheet> {
           ),
         ],
       ),
-      leading: Column(
-        mainAxisSize: .min,
-        spacing: 8.0,
-        children: [
-          if (showSearchBar)
-            Frame(
-              child: TextField(
-                onChanged: (value) => setState(() => _query = value),
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                  hintText: "general.search".t(context),
-                  prefixIcon: const Icon(Symbols.search_rounded),
+      leading: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Row(
+          children: [
+            if (showSearchBar)
+              Expanded(
+                child: Frame(
+                  child: TextField(
+                    onChanged: (value) => setState(() => _query = value),
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      hintText: "general.search".t(context),
+                      prefixIcon: const Icon(Symbols.search_rounded),
+                    ),
+                  ),
                 ),
+              )
+            else
+              const Spacer(),
+            if (showSearchBar) const SizedBox(width: 12.0),
+            TextButton(
+              onPressed: _toggleSelectAll,
+              child: Text(
+                selectedUuids.length == widget.categories.length
+                    ? "general.select.clear".t(context)
+                    : "general.select.all".t(context),
               ),
             ),
-          Frame(
-            child: Align(
-              alignment: AlignmentDirectional.topEnd,
-              child: TextButton(
-                onPressed: _toggleSelectAll,
-                child: Text(
-                  selectedUuids.length == widget.categories.length
-                      ? "general.select.clear".t(context)
-                      : "general.select.all".t(context),
-                ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ...results.map(
-              (category) => CheckboxListTile /*.adaptive*/ (
+            ...results.map((category) {
+              final bool isSelected = selectedUuids.contains(category.uuid);
+              return ListTile(
                 key: ValueKey(category.uuid),
-                title: Text(category.name),
-                value: selectedUuids.contains(category.uuid),
-                onChanged: (value) => select(category.uuid, value),
-                secondary: FlowIcon(category.icon),
-              ),
-            ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 24.0),
+                title: Text(
+                  category.name,
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected ? context.colorScheme.primary : null,
+                  ),
+                ),
+                leading: Container(
+                  width: 40.0,
+                  height: 40.0,
+                  decoration: BoxDecoration(
+                    color: category.colorScheme.primary.withAlpha(0x1A),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: FlowIcon(
+                      category.icon,
+                      colorScheme: category.colorScheme,
+                      size: 20.0,
+                    ),
+                  ),
+                ),
+                trailing: Icon(
+                  isSelected ? Symbols.check_circle_rounded : Symbols.circle,
+                  color: isSelected
+                      ? context.colorScheme.primary
+                      : context.colorScheme.onSurface.withAlpha(0x33),
+                  fill: isSelected ? 1.0 : 0.0,
+                ),
+                onTap: () => select(category.uuid, !isSelected),
+              );
+            }),
           ],
         ),
       ),

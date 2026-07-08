@@ -352,7 +352,7 @@ class TransactionListTile extends StatelessWidget {
     );
   }
 
-  FlowIcon buildLeading(
+  Widget buildLeading(
     BuildContext context,
     TransactionListTileThemeData theme,
   ) {
@@ -362,10 +362,9 @@ class TransactionListTile extends StatelessWidget {
     if (transaction.isTransfer) {
       iconData = FlowIconData.icon(Symbols.sync_alt_rounded);
     } else if (theme.useAccountIconForLeadingOrDefault) {
-      iconData =
-          AccountsProvider.of(context).get(transaction.accountUuid)?.icon ??
-          transaction.account.target?.icon ??
-          FlowIconData.icon(Symbols.circle_rounded);
+      final account = AccountsProvider.of(context).get(transaction.accountUuid) ?? transaction.account.target;
+      iconData = account?.icon ?? FlowIconData.icon(Symbols.circle_rounded);
+      colorScheme = account?.colorScheme;
     } else if (transaction.category.target != null) {
       iconData = transaction.category.target!.icon;
       colorScheme = transaction.category.target!.colorScheme;
@@ -373,12 +372,20 @@ class TransactionListTile extends StatelessWidget {
       iconData = FlowIconData.icon(Symbols.circle_rounded);
     }
 
-    return FlowIcon(
-      iconData,
-      plated: true,
-      fill: transaction.category.target != null ? 1.0 : 0.0,
-      color: colorScheme?.primary,
-      plateColor: colorScheme?.secondary,
+    final Color effectiveColor = colorScheme?.primary ?? context.colorScheme.primary;
+
+    return Container(
+      padding: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        color: effectiveColor.withAlpha(0x1A), // 10% opacity roughly
+        shape: BoxShape.circle,
+      ),
+      child: FlowIcon(
+        iconData,
+        size: 24.0,
+        color: effectiveColor,
+        plated: false,
+      ),
     );
   }
 

@@ -58,7 +58,7 @@ import "package:flow/routes/stats/spending_map_page.dart";
 import "package:flow/routes/stats/stats_by_group_page.dart";
 import "package:flow/routes/stats/wrapped_page.dart";
 import "package:flow/routes/splash_screen.dart";
-import "package:flow/routes/support_page.dart";
+
 import "package:flow/routes/transaction_batch_import_page.dart";
 import "package:flow/routes/transaction_page.dart";
 import "package:flow/routes/transaction_tag_page.dart";
@@ -474,7 +474,7 @@ final GoRouter router = GoRouter(
         ),
       ],
     ),
-    GoRoute(path: "/support", builder: (context, state) => const SupportPage()),
+
     GoRoute(
       path: "/stats/category",
       builder: (context, state) {

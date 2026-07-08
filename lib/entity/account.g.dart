@@ -11,7 +11,6 @@ Account _$AccountFromJson(Map<String, dynamic> json) => Account(
   currency: json['currency'] as String,
   iconCode: json['iconCode'] as String,
   creditLimit: (json['creditLimit'] as num?)?.toDouble(),
-  colorSchemeName: json['colorSchemeName'] as String?,
   excludeFromTotalBalance: json['excludeFromTotalBalance'] as bool? ?? false,
   archived: json['archived'] as bool? ?? false,
   sortOrder: (json['sortOrder'] as num?)?.toInt() ?? -1,
@@ -32,7 +31,6 @@ Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
   'type': instance.type,
   'excludeFromTotalBalance': instance.excludeFromTotalBalance,
   'archived': instance.archived,
-  'colorSchemeName': instance.colorSchemeName,
   'iconCode': instance.iconCode,
 };
 

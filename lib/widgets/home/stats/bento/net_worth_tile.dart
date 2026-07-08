@@ -71,7 +71,9 @@ class _NetWorthTileState extends State<NetWorthTile>
             child: hasTrend
                 ? NetWorthSparkline(
                     samples: samples,
-                    color: context.colorScheme.primary,
+                    color: currentAmount >= firstAmount
+                        ? context.flowColors.income
+                        : context.flowColors.expense,
                   )
                 : const SizedBox.shrink(),
           ),

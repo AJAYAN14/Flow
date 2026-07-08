@@ -1,87 +1,80 @@
 import "package:flow/l10n/extensions.dart";
+import "package:flow/theme/theme.dart";
 import "package:flow/utils/optional.dart";
-import "package:flow/widgets/general/modal_overflow_bar.dart";
 import "package:flow/widgets/general/modal_sheet.dart";
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
 
 /// Pops with an [Optional]\<bool> indicating whether to filter for transactions
-class SelectIsPendingSheet extends StatefulWidget {
+class SelectIsPendingSheet extends StatelessWidget {
   final bool? initialSelected;
 
   const SelectIsPendingSheet({super.key, this.initialSelected});
 
-  @override
-  State<SelectIsPendingSheet> createState() => _SelectIsPendingSheetState();
-}
-
-class _SelectIsPendingSheetState extends State<SelectIsPendingSheet> {
-  bool? _selected;
-
-  @override
-  void initState() {
-    super.initState();
-    _selected = widget.initialSelected;
-  }
-
-  @override
-  void didUpdateWidget(covariant SelectIsPendingSheet oldWidget) {
-    if (widget.initialSelected != oldWidget.initialSelected) {
-      _selected = widget.initialSelected;
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  String suffix(bool? value) => switch (value) {
+  String suffix(BuildContext context, bool? value) => switch (value) {
     null => ".all".t(context),
     true => "#true".t(context),
     false => "#false".t(context),
   };
 
+  IconData _getIconData(bool? value) => switch (value) {
+    null => Symbols.all_inclusive_rounded,
+    true => Symbols.schedule_rounded,
+    false => Symbols.task_alt_rounded,
+  };
+
   @override
   Widget build(BuildContext context) {
-    return ModalSheet(
+    return ModalSheet.scrollable(
       title: Text("transactions.query.filter.isPending".t(context)),
-      trailing: ModalOverflowBar(
-        alignment: .end,
-        children: [
-          TextButton.icon(
-            onPressed: pop,
-            icon: const Icon(Symbols.check_rounded),
-            label: Text("general.done".t(context)),
-          ),
-        ],
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: Wrap(
-          alignment: WrapAlignment.start,
-          spacing: 12.0,
-          runSpacing: 8.0,
-          children: [null, true, false]
-              .map(
-                (value) => ChoiceChip(
-                  label: Text(
-                    "transactions.query.filter.isPending${suffix(value)}".t(
-                      context,
-                    ),
-                  ),
-                  selected: _selected == value,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selected = value;
-                    });
-                  },
-                ),
-              )
-              .toList(),
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [null, true, false].map((value) {
+          final bool isSelected = initialSelected == value;
+          final Color textColor = isSelected 
+              ? context.colorScheme.primary 
+              : context.colorScheme.onSurface;
+          
+          return ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+            leading: Container(
+              width: 40.0,
+              height: 40.0,
+              decoration: BoxDecoration(
+                color: isSelected 
+                    ? context.colorScheme.primary.withAlpha(0x1A)
+                    : context.colorScheme.onSurface.withAlpha(0x0A),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _getIconData(value),
+                size: 20.0,
+                color: isSelected 
+                    ? context.colorScheme.primary
+                    : context.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            title: Text(
+              "transactions.query.filter.isPending${suffix(context, value)}".t(context),
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: textColor,
+              ),
+            ),
+            trailing: isSelected
+                ? Icon(Symbols.check_circle_rounded, color: context.colorScheme.primary)
+                : Icon(Symbols.circle, color: context.colorScheme.onSurface.withAlpha(0x33)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            onTap: () {
+              context.pop(Optional<bool>(value));
+            },
+          );
+        }).toList(),
       ),
     );
-  }
-
-  void pop() {
-    context.pop(Optional<bool>(_selected));
   }
 }

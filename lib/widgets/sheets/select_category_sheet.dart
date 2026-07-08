@@ -91,6 +91,8 @@ class _SelectCategorySheetState extends State<SelectCategorySheet> {
                 leading: FlowIcon(
                   category.icon,
                   colorScheme: category.colorScheme,
+                  plated: true,
+                  fill: 1.0,
                 ),
                 trailing: widget.showTrailing ? LeChevron() : null,
                 onTap: () => context.pop(Optional(category)),

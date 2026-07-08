@@ -9,20 +9,20 @@ export "helpers.dart";
 
 const Color kTransparent = Color(0x00000000);
 
-// Provide a single, static monochrome theme for the app.
+// Provide a modern, vibrant default theme for the app.
 final FlowColorScheme defaultColorScheme = FlowColorScheme(
-  name: "monochrome",
+  name: "premiumBlue",
   isDark: false,
   surface: const Color(0xfff7f8fa),
-  onSurface: const Color(0xff101828),
-  primary: const Color(0xff444444),
-  onPrimary: const Color(0xfff7f8fa),
-  secondary: const Color(0xfff1f2f4),
-  onSecondary: const Color(0xff101828),
+  onSurface: const Color(0xff0F172A), // Slate 900
+  primary: const Color(0xFF2563EB),   // Royal Blue (Premium)
+  onPrimary: const Color(0xffffffff),
+  secondary: const Color(0xFFF1F5F9), // Slate 100
+  onSecondary: const Color(0xff0F172A),
   customColors: const FlowCustomColors(
     income: Color(0xFF15803D),
-    expense: Color(0xFFC42525),
-    semi: Color(0xFF6A666D),
+    expense: Color(0xFFDC2626),
+    semi: Color(0xFF64748B),
   ),
 );
 

@@ -2,6 +2,7 @@ import "package:flow/data/flow_icon.dart";
 import "package:flow/entity/_base.dart";
 import "package:flow/entity/transaction.dart";
 import "package:flow/theme/flow_color_scheme.dart";
+import "package:flow/theme/primary_colors.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/utils/json/utc_datetime_converter.dart";
 import "package:json_annotation/json_annotation.dart";
@@ -35,10 +36,14 @@ class Category implements EntityBase {
 
   String iconCode;
 
-  String? colorSchemeName;
-
   @Transient()
-  FlowColorScheme get colorScheme => defaultColorScheme;
+  FlowColorScheme get colorScheme {
+    final int idx = uuid.hashCode.abs();
+    return defaultColorScheme.copyWith(
+      primary: primaryColors[idx % primaryColors.length],
+      secondary: accentColors[idx % accentColors.length],
+    );
+  }
 
   @Transient()
   FlowIconData get icon {
@@ -54,7 +59,6 @@ class Category implements EntityBase {
     required this.name,
     required this.iconCode,
     DateTime? createdDate,
-    this.colorSchemeName,
   }) : createdDate = createdDate ?? DateTime.now(),
        uuid = const Uuid().v4();
 
@@ -62,7 +66,6 @@ class Category implements EntityBase {
     required this.name,
     required this.iconCode,
     required this.uuid,
-    this.colorSchemeName,
   }) : createdDate = DateTime.now(),
        id = -1;
 

@@ -3,6 +3,7 @@ import "package:flow/entity/_base.dart";
 import "package:flow/entity/transaction/tag_type.dart";
 import "package:flow/entity/transaction_type/payload.dart";
 import "package:flow/theme/flow_color_scheme.dart";
+import "package:flow/theme/primary_colors.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/utils/extensions/transaction_tag_type.dart";
 import "package:flow/utils/json/utc_datetime_converter.dart";
@@ -36,10 +37,14 @@ class TransactionTag extends EntityBase {
 
   String? iconCode;
 
-  String? colorSchemeName;
-
   @Transient()
-  FlowColorScheme get colorScheme => defaultColorScheme;
+  FlowColorScheme get colorScheme {
+    final int idx = uuid.hashCode.abs();
+    return defaultColorScheme.copyWith(
+      primary: primaryColors[idx % primaryColors.length],
+      secondary: accentColors[idx % accentColors.length],
+    );
+  }
 
   @Transient()
   FlowIconData get icon {
@@ -86,7 +91,6 @@ class TransactionTag extends EntityBase {
     this.type,
     this.payload,
     this.iconCode,
-    this.colorSchemeName,
   }) : createdDate = createdDate ?? DateTime.now(),
        uuid = Uuid.isValidUUID(fromString: uuid ?? "")
            ? uuid!

@@ -1,3 +1,4 @@
+import "dart:math" as math;
 import "package:flow/theme/theme.dart";
 import "package:flutter/material.dart";
 
@@ -26,25 +27,29 @@ class SankeyDatum {
 class SankeyDiagram extends StatelessWidget {
   final List<SankeyDatum> sources;
   final List<SankeyDatum> targets;
-  final double height;
+  final double maxHeight;
 
   const SankeyDiagram({
     super.key,
     required this.sources,
     required this.targets,
-    this.height = 280.0,
+    this.maxHeight = 280.0,
   });
 
   @override
   Widget build(BuildContext context) {
+    final int maxNodes = math.max(sources.length, targets.length);
+    // Dynamically scale height to prevent massive flat blocks for 1-to-1 flows
+    final double dynamicHeight = (maxNodes * 60.0).clamp(120.0, maxHeight);
+
     return SizedBox(
-      height: height,
+      height: dynamicHeight,
       width: double.infinity,
       child: CustomPaint(
         painter: _SankeyPainter(
           sources: sources,
           targets: targets,
-          hubColor: context.colorScheme.onSurface.withAlpha(0x33),
+          hubColor: context.colorScheme.onSurface.withAlpha(0x20),
         ),
       ),
     );
@@ -56,9 +61,9 @@ class _SankeyPainter extends CustomPainter {
   final List<SankeyDatum> targets;
   final Color hubColor;
 
-  static const double _nodeWidth = 12.0;
-  static const double _gap = 6.0;
-  static const int _ribbonAlpha = 0x4d;
+  static const double _nodeWidth = 14.0;
+  static const double _gap = 12.0;
+  static const int _ribbonAlpha = 0x66;
 
   _SankeyPainter({
     required this.sources,
@@ -87,7 +92,7 @@ class _SankeyPainter extends CustomPainter {
     final double hubRight = hubLeft + _nodeWidth;
     final double rightLeft = size.width - _nodeWidth;
 
-    // Left ribbons: each source node -> its contiguous slice of the hub.
+    // Left ribbons
     double leftCursor = 0.0;
     double hubLeftCursor = 0.0;
     for (final SankeyDatum source in sources) {
@@ -105,13 +110,14 @@ class _SankeyPainter extends CustomPainter {
         hubTop,
         hubBottom,
         source.color,
+        hubColor,
       );
 
       leftCursor = nodeBottom + _gap;
       hubLeftCursor = hubBottom;
     }
 
-    // Right ribbons: each contiguous slice of the hub -> its target node.
+    // Right ribbons
     double rightCursor = 0.0;
     double hubRightCursor = 0.0;
     for (final SankeyDatum target in targets) {
@@ -128,6 +134,7 @@ class _SankeyPainter extends CustomPainter {
         hubBottom,
         nodeTop,
         nodeBottom,
+        hubColor,
         target.color,
       );
 
@@ -135,7 +142,7 @@ class _SankeyPainter extends CustomPainter {
       hubRightCursor = hubBottom;
     }
 
-    // Nodes drawn on top of the ribbons.
+    // Nodes
     _drawNodes(canvas, 0.0, sources, leftScale);
     _drawNodes(canvas, rightLeft, targets, rightScale);
     _drawHub(canvas, hubLeft, height);
@@ -149,7 +156,8 @@ class _SankeyPainter extends CustomPainter {
     double bottomLeft,
     double topRight,
     double bottomRight,
-    Color color,
+    Color leftColor,
+    Color rightColor,
   ) {
     final double midX = (xLeft + xRight) / 2;
     final Path path = Path()
@@ -159,11 +167,18 @@ class _SankeyPainter extends CustomPainter {
       ..cubicTo(midX, bottomRight, midX, bottomLeft, xLeft, bottomLeft)
       ..close();
 
+    final Gradient gradient = LinearGradient(
+      colors: [
+        leftColor.withAlpha(_ribbonAlpha),
+        rightColor.withAlpha(_ribbonAlpha),
+      ],
+    );
+
     canvas.drawPath(
       path,
       Paint()
         ..style = PaintingStyle.fill
-        ..color = color.withAlpha(_ribbonAlpha),
+        ..shader = gradient.createShader(Rect.fromLTRB(xLeft, 0, xRight, 1)),
     );
   }
 

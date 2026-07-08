@@ -9,6 +9,7 @@ import "package:flow/widgets/general/wavy_divider.dart";
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
+import "package:flow/widgets/general/premium_list_tile.dart";
 
 /// Pops with a [Optional] ICU pattern number formatter, or [Optional] null
 /// from a pre-defined list of patterns.
@@ -92,34 +93,51 @@ class _SelectCurrencyIcuPatternState extends State<SelectCurrencyIcuPattern> {
         ],
       ),
       child: SingleChildScrollView(
-        child: RadioGroup<String?>(
-          groupValue: selectedPattern?.value,
-          onChanged: (value) {
-            setState(() {
-              selectedPattern = Optional(value);
-            });
-          },
-          child: Column(
-            children: SelectCurrencyIcuPattern.patterns
-                .map(
-                  (pattern) => RadioListTile<String?>(
-                    title: Text(
-                      Money(123456.78, primaryCurrency).formatMoney(
-                        customIcuPattern: pattern == null
-                            ? Optional<String?>(null)
-                            : Optional(pattern),
-                      ),
-                    ),
-                    subtitle: pattern == null
-                        ? Text(
-                            "preferences.moneyFormatting.setICUPattern.default"
-                                .t(context),
-                          )
-                        : null,
-                    value: pattern,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 24.0),
+          child: PremiumListGroup(
+            children: SelectCurrencyIcuPattern.patterns.asMap().entries.expand((entry) {
+              final index = entry.key;
+              final pattern = entry.value;
+              final isSelected = selectedPattern?.value == pattern;
+              final accentColor = isSelected ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8);
+
+              final tile = PremiumListTile(
+                title: Text(
+                  Money(123456.78, primaryCurrency).formatMoney(
+                    customIcuPattern: pattern == null
+                        ? Optional<String?>(null)
+                        : Optional(pattern),
                   ),
-                )
-                .toList(),
+                ),
+                subtitle: pattern == null
+                    ? Text("preferences.moneyFormatting.setICUPattern.default".t(context))
+                    : null,
+                leading: Symbols.payments_rounded,
+                accent: accentColor,
+                showChevron: false,
+                trailing: Radio<String?>(
+                  value: pattern,
+                  groupValue: selectedPattern?.value,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedPattern = Optional(value);
+                    });
+                  },
+                ),
+                onTap: () {
+                  setState(() {
+                    selectedPattern = Optional(pattern);
+                  });
+                },
+              );
+
+              return [
+                if (index > 0)
+                  const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                tile,
+              ];
+            }).toList(),
           ),
         ),
       ),

@@ -8,6 +8,8 @@ import "package:flow/widgets/general/directional_chevron.dart";
 import "package:flow/widgets/general/money_text.dart";
 import "package:flow/widgets/sheets/select_currency_icu_pattern.dart";
 import "package:flutter/material.dart";
+import "package:flow/widgets/general/premium_list_tile.dart";
+import "package:material_symbols_icons_flow/symbols.dart";
 
 class MoneyFormattingPreferencesPage extends StatefulWidget {
   const MoneyFormattingPreferencesPage({super.key});
@@ -40,37 +42,52 @@ class _MoneyFormattingPreferencesPageState
                   style: context.textTheme.displaySmall,
                 ),
               ),
-              const SizedBox(height: 16.0),
-              CheckboxListTile(
-                title: Text(
-                  "preferences.moneyFormatting.preferFull".t(context),
-                ),
-                subtitle: Text(
-                  "preferences.moneyFormatting.preferFull.description".t(
-                    context,
+              const SizedBox(height: 24.0),
+              PremiumListGroup(
+                children: [
+                  PremiumListTile(
+                    title: Text(
+                      "preferences.moneyFormatting.preferFull".t(context),
+                    ),
+                    subtitle: Text(
+                      "preferences.moneyFormatting.preferFull.description".t(context),
+                    ),
+                    leading: Symbols.numbers_rounded,
+                    accent: const Color(0xFF3B82F6), // Blue
+                    showChevron: false,
+                    onTap: () => updatePreferFullAmounts(!preferFullAmounts),
+                    trailing: Checkbox(
+                      value: preferFullAmounts,
+                      onChanged: updatePreferFullAmounts,
+                    ),
                   ),
-                ),
-                value: preferFullAmounts,
-                onChanged: updatePreferFullAmounts,
-              ),
-              CheckboxListTile(
-                title: Text(
-                  "preferences.moneyFormatting.useCurrencySymbol".t(context),
-                ),
-                subtitle: Text(
-                  "preferences.moneyFormatting.useCurrencySymbol.description".t(
-                    context,
+                  const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                  PremiumListTile(
+                    title: Text(
+                      "preferences.moneyFormatting.useCurrencySymbol".t(context),
+                    ),
+                    subtitle: Text(
+                      "preferences.moneyFormatting.useCurrencySymbol.description".t(context),
+                    ),
+                    leading: Symbols.attach_money_rounded,
+                    accent: const Color(0xFF10B981), // Emerald
+                    showChevron: false,
+                    onTap: () => updateUseCurrencySymbol(!useCurrencySymbol),
+                    trailing: Checkbox(
+                      value: useCurrencySymbol,
+                      onChanged: updateUseCurrencySymbol,
+                    ),
                   ),
-                ),
-                value: useCurrencySymbol,
-                onChanged: updateUseCurrencySymbol,
-              ),
-              ListTile(
-                title: Text(
-                  "preferences.moneyFormatting.setICUPattern".t(context),
-                ),
-                onTap: updateCustomICUCurrencyFormatter,
-                trailing: const LeChevron(),
+                  const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+                  PremiumListTile(
+                    title: Text(
+                      "preferences.moneyFormatting.setICUPattern".t(context),
+                    ),
+                    leading: Symbols.tune_rounded,
+                    accent: const Color(0xFF8B5CF6), // Purple
+                    onTap: updateCustomICUCurrencyFormatter,
+                  ),
+                ],
               ),
             ],
           ),

@@ -31,9 +31,17 @@ class NetWorthSparkline extends StatelessWidget {
         borderData: FlBorderData(show: false),
         lineBarsData: [
           LineChartBarData(
-            barWidth: 2.5,
+            barWidth: 3.0,
             color: color,
+            isCurved: true,
+            curveSmoothness: 0.35,
+            preventCurveOverShooting: true,
             isStrokeCapRound: true,
+            shadow: Shadow(
+              color: color.withAlpha(0x40),
+              offset: const Offset(0, 4),
+              blurRadius: 8.0,
+            ),
             dotData: const FlDotData(show: false),
             spots: samples
                 .asMap()

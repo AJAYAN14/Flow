@@ -5,6 +5,7 @@ import "package:flow/entity/transaction.dart";
 import "package:flow/l10n/named_enum.dart";
 import "package:flow/objectbox/actions.dart";
 import "package:flow/theme/flow_color_scheme.dart";
+import "package:flow/theme/primary_colors.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/utils/json/utc_datetime_converter.dart";
 import "package:json_annotation/json_annotation.dart";
@@ -64,10 +65,14 @@ class Account implements EntityBase {
   bool excludeFromTotalBalance;
   bool archived;
 
-  String? colorSchemeName;
-
   @Transient()
-  FlowColorScheme get colorScheme => defaultColorScheme;
+  FlowColorScheme get colorScheme {
+    final int idx = uuid.hashCode.abs();
+    return defaultColorScheme.copyWith(
+      primary: primaryColors[idx % primaryColors.length],
+      secondary: accentColors[idx % accentColors.length],
+    );
+  }
 
   String iconCode;
 
@@ -103,7 +108,6 @@ class Account implements EntityBase {
     required this.currency,
     required this.iconCode,
     this.creditLimit,
-    this.colorSchemeName,
     this.excludeFromTotalBalance = false,
     this.archived = false,
     this.sortOrder = -1,
@@ -118,7 +122,6 @@ class Account implements EntityBase {
     required this.iconCode,
     required this.uuid,
     this.creditLimit,
-    this.colorSchemeName,
     this.type = AccountType.debitValue,
     this.excludeFromTotalBalance = false,
   }) : archived = false,

@@ -37,7 +37,9 @@ class PremiumListGroup extends StatelessWidget {
 /// A premium list tile with a tinted circular icon background.
 class PremiumListTile extends StatelessWidget {
   final Widget title;
-  final IconData leading;
+  final Widget? subtitle;
+  final IconData? leading;
+  final Widget? leadingWidget;
   final Color accent;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -47,13 +49,15 @@ class PremiumListTile extends StatelessWidget {
   const PremiumListTile({
     super.key,
     required this.title,
-    required this.leading,
+    this.subtitle,
+    this.leading,
+    this.leadingWidget,
     required this.accent,
     this.onTap,
     this.onLongPress,
     this.trailing,
     this.showChevron = true,
-  });
+  }) : assert(leading != null || leadingWidget != null);
 
   @override
   Widget build(BuildContext context) {
@@ -70,16 +74,30 @@ class PremiumListTile extends StatelessWidget {
                 color: accent.withAlpha(0x26), // 15% opacity
                 shape: BoxShape.circle,
               ),
-              child: Icon(leading, color: accent, size: 20.0),
+              child: leadingWidget ?? Icon(leading, color: accent, size: 20.0),
             ),
             const SizedBox(width: 16.0),
             Expanded(
-              child: DefaultTextStyle(
-                style: context.textTheme.bodyLarge!.copyWith(
-                  color: const Color(0xFF1E293B), // Slate 800
-                  fontWeight: FontWeight.w500,
-                ),
-                child: title,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DefaultTextStyle(
+                    style: context.textTheme.bodyLarge!.copyWith(
+                      color: const Color(0xFF1E293B), // Slate 800
+                      fontWeight: FontWeight.w500,
+                    ),
+                    child: title,
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2.0),
+                    DefaultTextStyle(
+                      style: context.textTheme.bodyMedium!.copyWith(
+                        color: const Color(0xFF64748B), // Slate 500
+                      ),
+                      child: subtitle!,
+                    ),
+                  ],
+                ],
               ),
             ),
             if (trailing != null) trailing!,

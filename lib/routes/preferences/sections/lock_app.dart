@@ -10,6 +10,7 @@ import "package:flow/widgets/general/info_text.dart";
 import "package:flutter/material.dart";
 import "package:logging/logging.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
+import "package:flow/widgets/general/premium_list_tile.dart";
 
 final Logger _log = Logger("LockApp");
 
@@ -32,20 +33,32 @@ class _LockAppState extends State<LockApp> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SwitchListTile(
-          secondary: const Icon(Symbols.lock_rounded),
+        const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+        PremiumListTile(
+          leading: Symbols.lock_rounded,
           title: Text("preferences.privacy.appLock".t(context)),
-          value: requireLocalAuth,
-          onChanged: updateRequireLocalAuth,
-        ),
-        SwitchListTile(
-          secondary: const Icon(Symbols.lock_rounded),
-          title: Text(
-            "preferences.privacy.appLock.lockAfterClosing".t(context),
+          accent: const Color(0xFFEF4444), // Red
+          showChevron: false,
+          onTap: () => updateRequireLocalAuth(!requireLocalAuth),
+          trailing: Switch(
+            value: requireLocalAuth,
+            onChanged: updateRequireLocalAuth,
           ),
-          value: requireLocalAuthOnBlur,
-          onChanged: requireLocalAuth ? updateRequireLocalAuthOnBlur : null,
         ),
+        if (requireLocalAuth || requireLocalAuthOnBlur) ...[
+          const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
+          PremiumListTile(
+            leading: Symbols.lock_rounded,
+            title: Text("preferences.privacy.appLock.lockAfterClosing".t(context)),
+            accent: const Color(0xFFF59E0B), // Amber
+            showChevron: false,
+            onTap: requireLocalAuth ? () => updateRequireLocalAuthOnBlur(!requireLocalAuthOnBlur) : null,
+            trailing: Switch(
+              value: requireLocalAuthOnBlur,
+              onChanged: requireLocalAuth ? updateRequireLocalAuthOnBlur : null,
+            ),
+          ),
+        ],
         if (Platform.isLinux) ...[
           const SizedBox(height: 8.0),
           Frame(

@@ -104,12 +104,6 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(16, 5820369881987699214),
-        name: 'colorSchemeName',
-        type: 9,
-        flags: 0,
-      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[
@@ -155,12 +149,6 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(6, 7989789340130049283),
         name: 'iconCode',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(10, 8207473128907508304),
-        name: 'colorSchemeName',
         type: 9,
         flags: 0,
       ),
@@ -828,12 +816,6 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(11, 3938547905203366311),
-        name: 'colorSchemeName',
-        type: 9,
-        flags: 0,
-      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -1058,6 +1040,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
       2071092278574175844,
       801892318627771901,
       4590726328503721316,
+      5820369881987699214,
+      8207473128907508304,
+      3938547905203366311,
     ],
     retiredRelationUids: const [552720950599490473],
     modelVersion: 5,
@@ -1086,9 +1071,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final currencyOffset = fbb.writeString(object.currency);
         final iconCodeOffset = fbb.writeString(object.iconCode);
         final typeOffset = fbb.writeString(object.type);
-        final colorSchemeNameOffset = object.colorSchemeName == null
-            ? null
-            : fbb.writeString(object.colorSchemeName!);
         fbb.startTable(17);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
@@ -1101,7 +1083,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(11, object.archived);
         fbb.addFloat64(12, object.creditLimit);
         fbb.addOffset(14, typeOffset);
-        fbb.addOffset(15, colorSchemeNameOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1128,9 +1109,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
           rootOffset,
           28,
         );
-        final colorSchemeNameParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 34);
         final excludeFromTotalBalanceParam = const fb.BoolReader().vTableGet(
           buffer,
           rootOffset,
@@ -1162,7 +1140,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 currency: currencyParam,
                 iconCode: iconCodeParam,
                 creditLimit: creditLimitParam,
-                colorSchemeName: colorSchemeNameParam,
                 excludeFromTotalBalance: excludeFromTotalBalanceParam,
                 archived: archivedParam,
                 sortOrder: sortOrderParam,
@@ -1202,16 +1179,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final uuidOffset = fbb.writeString(object.uuid);
         final nameOffset = fbb.writeString(object.name);
         final iconCodeOffset = fbb.writeString(object.iconCode);
-        final colorSchemeNameOffset = object.colorSchemeName == null
-            ? null
-            : fbb.writeString(object.colorSchemeName!);
         fbb.startTable(11);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
         fbb.addInt64(2, object.createdDate.millisecondsSinceEpoch);
         fbb.addOffset(3, nameOffset);
         fbb.addOffset(5, iconCodeOffset);
-        fbb.addOffset(9, colorSchemeNameOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1233,16 +1206,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final createdDateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0),
         );
-        final colorSchemeNameParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 22);
         final object =
             Category(
                 id: idParam,
                 name: nameParam,
                 iconCode: iconCodeParam,
                 createdDate: createdDateParam,
-                colorSchemeName: colorSchemeNameParam,
               )
               ..uuid = const fb.StringReader(
                 asciiOptimization: true,
@@ -2033,9 +2002,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final iconCodeOffset = object.iconCode == null
             ? null
             : fbb.writeString(object.iconCode!);
-        final colorSchemeNameOffset = object.colorSchemeName == null
-            ? null
-            : fbb.writeString(object.colorSchemeName!);
         fbb.startTable(12);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
@@ -2046,7 +2012,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(6, typeOffset);
         fbb.addOffset(7, payloadOffset);
         fbb.addOffset(8, iconCodeOffset);
-        fbb.addOffset(10, colorSchemeNameOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -2090,9 +2055,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final iconCodeParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 20);
-        final colorSchemeNameParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 24);
         final object = TransactionTag(
           id: idParam,
           uuid: uuidParam,
@@ -2103,7 +2065,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
           type: typeParam,
           payload: payloadParam,
           iconCode: iconCodeParam,
-          colorSchemeName: colorSchemeNameParam,
         );
 
         return object;
@@ -2317,11 +2278,6 @@ class Account_ {
     _entities[0].properties[10],
   );
 
-  /// See [Account.colorSchemeName].
-  static final colorSchemeName = obx.QueryStringProperty<Account>(
-    _entities[0].properties[11],
-  );
-
   /// see [Account.transactions]
   static final transactions = obx.QueryBacklinkToMany<Transaction, Account>(
     Transaction_.account,
@@ -2353,11 +2309,6 @@ class Category_ {
   /// See [Category.iconCode].
   static final iconCode = obx.QueryStringProperty<Category>(
     _entities[1].properties[4],
-  );
-
-  /// See [Category.colorSchemeName].
-  static final colorSchemeName = obx.QueryStringProperty<Category>(
-    _entities[1].properties[5],
   );
 
   /// see [Category.transactions]
@@ -2839,11 +2790,6 @@ class TransactionTag_ {
   /// See [TransactionTag.iconCode].
   static final iconCode = obx.QueryStringProperty<TransactionTag>(
     _entities[9].properties[8],
-  );
-
-  /// See [TransactionTag.colorSchemeName].
-  static final colorSchemeName = obx.QueryStringProperty<TransactionTag>(
-    _entities[9].properties[9],
   );
 }
 
