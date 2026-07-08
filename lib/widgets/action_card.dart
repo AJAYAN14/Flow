@@ -3,12 +3,14 @@ import "package:flow/theme/helpers.dart";
 import "package:flow/widgets/general/flow_icon.dart";
 import "package:flow/widgets/general/surface.dart";
 import "package:flutter/material.dart";
+import "package:material_symbols_icons_flow/symbols.dart";
 
 class ActionCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
   final FlowIconData? icon;
+  final Widget? customIcon;
   final String title;
   final String? subtitle;
   final Widget? trailing;
@@ -19,9 +21,10 @@ class ActionCard extends StatelessWidget {
     super.key,
     this.onTap,
     this.onLongPress,
-    this.borderRadius = const .all(Radius.circular(16.0)),
+    this.borderRadius = const BorderRadius.all(Radius.circular(24.0)),
     required this.title,
     this.icon,
+    this.customIcon,
     this.subtitle,
     this.trailing,
   });
@@ -31,28 +34,64 @@ class ActionCard extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Surface(
+        margin: EdgeInsets.zero,
+        color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: borderRadius),
         builder: (context) => InkWell(
           borderRadius: borderRadius,
           onTap: onTap,
           onLongPress: onLongPress,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-            child: Column(
-              crossAxisAlignment: .start,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (icon != null) ...[
-                  FlowIcon(icon!, size: 80.0, plated: true),
-                  const SizedBox(height: 8.0),
+                if (icon != null || customIcon != null) ...[
+                  customIcon ?? FlowIcon(
+                    icon!,
+                    size: 24.0,
+                    plated: true,
+                    color: const Color(0xFF2563EB), // ui-ux-pro-max Blue
+                    plateColor: const Color(0xFFEFF6FF), // Light Blue
+                    platePadding: const EdgeInsets.all(8.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  const SizedBox(width: 16.0),
                 ],
-                Text(title, style: context.textTheme.headlineSmall),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 4.0),
-                  Text(subtitle!, style: context.textTheme.bodyMedium),
-                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        style: context.textTheme.titleMedium!.semi(context).copyWith(
+                              color: const Color(0xFF0F172A), // Slate 900
+                            ),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2.0),
+                        Text(
+                          subtitle!,
+                          style: context.textTheme.bodyMedium!.copyWith(
+                            color: const Color(0xFF475569), // Slate 600
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
                 if (trailing != null) ...[
-                  const SizedBox(height: 8.0),
+                  const SizedBox(width: 16.0),
                   trailing!,
+                ] else if (onTap != null) ...[
+                  const SizedBox(width: 16.0),
+                  Icon(
+                    Symbols.chevron_right_rounded,
+                    fill: 0,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  ),
                 ],
               ],
             ),

@@ -42,35 +42,56 @@ class _FileSelectAreaState extends State<FileSelectArea> {
               padding: const EdgeInsets.all(16.0),
               child: InkWell(
                 onTap: widget.onTap,
-                borderRadius: .circular(16.0),
-                child: Surface(
-                  builder: (context) => Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        FlowIcon(
-                          FlowIconData.icon(Symbols.cloud_upload_rounded),
-                          size: 80.0,
-                        ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          showDropText
-                              ? "sync.import.pickFile.pickOrDrop".t(context)
-                              : "sync.import.pickFile".t(context),
-                          style: context.textTheme.headlineSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          "sync.import.pickFile.description".t(
-                            context,
-                            "ZIP, JSON, CSV",
-                          ),
-                          style: context.textTheme.bodyMedium?.semi(context),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                borderRadius: BorderRadius.circular(24.0),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                      width: 2.0,
                     ),
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFEFF6FF),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Symbols.cloud_upload_rounded,
+                          fill: 1,
+                          size: 40.0,
+                          color: const Color(0xFF2563EB),
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        showDropText
+                            ? "sync.import.pickFile.pickOrDrop".t(context)
+                            : "sync.import.pickFile".t(context),
+                        style: context.textTheme.titleLarge!.semi(context).copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        "sync.import.pickFile.description".t(
+                          context,
+                          "ZIP, JSON, CSV",
+                        ),
+                        style: context.textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               ),

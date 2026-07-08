@@ -97,15 +97,12 @@ class StatsByGroupPageState extends State<StatsByGroupPage>
 
           return Column(
             children: [
-              Material(
-                elevation: 1.0,
-                child: Container(
-                  padding: const EdgeInsets.all(16.0).copyWith(bottom: 8.0),
-                  width: double.infinity,
-                  child: TimeRangeSelector(
-                    initialValue: range,
-                    onChanged: updateRange,
-                  ),
+              Container(
+                padding: const EdgeInsets.all(16.0).copyWith(bottom: 8.0),
+                width: double.infinity,
+                child: TimeRangeSelector(
+                  initialValue: range,
+                  onChanged: updateRange,
                 ),
               ),
               if (busy)

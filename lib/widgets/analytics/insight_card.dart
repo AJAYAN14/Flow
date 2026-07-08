@@ -1,3 +1,4 @@
+import "package:flow/theme/helpers.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/widgets/general/surface.dart";
 import "package:flutter/material.dart";
@@ -39,9 +40,13 @@ class InsightCard extends StatelessWidget {
     final bool hasHeader = icon != null || label != null;
 
     return Surface(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(24.0)),
+      ),
+      color: Colors.white,
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
       builder: (context) => InkWell(
-        borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+        borderRadius: const BorderRadius.all(Radius.circular(24.0)),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -63,7 +68,10 @@ class InsightCard extends StatelessWidget {
                 const SizedBox(height: 10.0),
               ],
               DefaultTextStyle.merge(
-                style: context.textTheme.titleSmall ?? const TextStyle(),
+                style: context.textTheme.titleMedium?.semi(context).copyWith(
+                      color: const Color(0xFF0F172A),
+                    ) ??
+                    const TextStyle(),
                 child: title,
               ),
               if (subtitle != null) ...[

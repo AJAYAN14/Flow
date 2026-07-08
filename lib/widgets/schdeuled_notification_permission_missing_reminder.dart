@@ -36,74 +36,25 @@ class _SchdeuledNotificationPermissionMissingReminderState
 
     if (!widget.permissions.hasNotificationPermission) {
       children.add(
-        InkWell(
-          onTap: openNotificationsSettings,
-          child: Frame.standalone(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Symbols.warning_rounded,
-                  fill: 0,
-                  color: context.colorScheme.error,
-                  size: 24.0,
-                ),
-                const SizedBox(width: 12.0),
-                Expanded(
-                  child: DefaultTextStyle(
-                    style: context.textTheme.bodyMedium!
-                        .semi(context)
-                        .copyWith(color: context.colorScheme.error),
-                    child: Text(
-                      "notifications.permissionNotGranted".t(context),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                busy
-                    ? SizedBox(width: 24.0, height: 24.0, child: Spinner())
-                    : Icon(Symbols.open_in_new_rounded, fill: 0, size: 24.0),
-              ],
-            ),
-          ),
+        _buildWarningBanner(
+          context: context,
+          icon: Symbols.warning_rounded,
+          text: "notifications.permissionNotGranted".t(context),
         ),
       );
+      children.add(const SizedBox(height: 12.0));
     }
 
     if (!widget.permissions.hasAlarmPermission) {
       children.add(
-        InkWell(
-          onTap: openNotificationsSettings,
-          child: Frame.standalone(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Symbols.alarm_off_rounded,
-                  fill: 0,
-                  color: context.colorScheme.error,
-                  size: 24.0,
-                ),
-                const SizedBox(width: 12.0),
-                Expanded(
-                  child: DefaultTextStyle(
-                    style: context.textTheme.bodyMedium!
-                        .semi(context)
-                        .copyWith(color: context.colorScheme.error),
-                    child: Text(
-                      "notifications.alarm.permissionNotGranted".t(context),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                busy
-                    ? SizedBox(width: 24.0, height: 24.0, child: Spinner())
-                    : Icon(Symbols.open_in_new_rounded, fill: 0, size: 24.0),
-              ],
-            ),
-          ),
+        _buildWarningBanner(
+          context: context,
+          icon: Symbols.alarm_off_rounded,
+          text: "notifications.alarm.permissionNotGranted".t(context),
         ),
       );
+      children.add(const SizedBox(height: 12.0));
+      
       if (Platform.isAndroid) {
         children.add(
           Frame(
@@ -115,7 +66,57 @@ class _SchdeuledNotificationPermissionMissingReminderState
       }
     }
 
-    return Column(mainAxisSize: .min, children: children);
+    return Column(mainAxisSize: MainAxisSize.min, children: children);
+  }
+
+  Widget _buildWarningBanner({
+    required BuildContext context,
+    required IconData icon,
+    required String text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Material(
+        color: context.colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(12.0),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: openNotificationsSettings,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  fill: 0,
+                  color: context.colorScheme.onErrorContainer,
+                  size: 24.0,
+                ),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: DefaultTextStyle(
+                    style: context.textTheme.bodyMedium!
+                        .semi(context)
+                        .copyWith(color: context.colorScheme.onErrorContainer),
+                    child: Text(text),
+                  ),
+                ),
+                const SizedBox(width: 12.0),
+                busy
+                    ? const SizedBox(width: 24.0, height: 24.0, child: Spinner())
+                    : Icon(
+                        Symbols.open_in_new_rounded,
+                        fill: 0,
+                        size: 24.0,
+                        color: context.colorScheme.onErrorContainer,
+                      ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void openNotificationsSettings() async {

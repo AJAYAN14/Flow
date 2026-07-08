@@ -8,8 +8,9 @@ import "package:flow/services/exchange_rates.dart";
 import "package:flow/services/user_preferences.dart";
 import "package:flow/widgets/categories/no_categories.dart";
 import "package:flow/widgets/category_card.dart";
-import "package:flow/widgets/general/button.dart";
+import "package:flow/theme/helpers.dart";
 import "package:flow/widgets/general/spinner.dart";
+import "package:flow/widgets/general/surface.dart";
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
@@ -69,29 +70,66 @@ class _CategoriesPageState extends State<CategoriesPage> {
                           UserPreferencesService().primaryCurrency;
 
                       return SingleChildScrollView(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                         child: Column(
                           spacing: 16.0,
                           crossAxisAlignment: .stretch,
                           children: [
-                            Button(
-                              onTap: () => context.push("/category/new"),
-                              leading: Icon(Symbols.add_rounded),
-                              child: Text("category.new".t(context)),
-                            ),
-                            if (showPresetsButton)
-                              Button(
-                                leading: Icon(Symbols.category_rounded),
-                                onTap: () {
-                                  context.push(
-                                    "/setup/categories?standalone=true&selectAll=false",
-                                  );
-                                },
-                                child: Text(
-                                  "categories.addFromPresets".t(context),
+                            Surface(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
+                              builder: (context) => InkWell(
+                                borderRadius: BorderRadius.circular(24.0),
+                                onTap: () => context.push("/category/new"),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Symbols.add_rounded, size: 24.0, color: Color(0xFF0F172A)),
+                                      const SizedBox(width: 16.0),
+                                      Text(
+                                        "category.new".t(context),
+                                        style: context.textTheme.titleMedium!.semi(context).copyWith(
+                                          color: const Color(0xFF0F172A),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            const Divider(),
+                            ),
+                            if (showPresetsButton)
+                              Surface(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
+                                builder: (context) => InkWell(
+                                  borderRadius: BorderRadius.circular(24.0),
+                                  onTap: () {
+                                    context.push(
+                                      "/setup/categories?standalone=true&selectAll=false",
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Symbols.category_rounded, size: 24.0, color: Color(0xFF0F172A)),
+                                        const SizedBox(width: 16.0),
+                                        Text(
+                                          "categories.addFromPresets".t(context),
+                                          style: context.textTheme.titleMedium!.semi(context).copyWith(
+                                            color: const Color(0xFF0F172A),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Divider(color: Color(0xFFE2E8F0)), // ui-ux-pro-max slate-200
+                            ),
                             ...categories.map(
                               (category) => CategoryCard(
                                 category: category,

@@ -7,6 +7,7 @@ import "package:flow/sync/import.dart";
 import "package:flow/sync/import/base.dart";
 import "package:flow/utils/extensions/importer.dart";
 import "package:flow/utils/utils.dart";
+import "package:flow/widgets/action_card.dart";
 import "package:flow/widgets/general/list_header.dart";
 import "package:flow/widgets/general/spinner.dart";
 import "package:flow/widgets/import/file_select_area.dart";
@@ -51,26 +52,50 @@ class _ImportPageState extends State<ImportPage> {
                     const SizedBox(height: 16.0),
                     ListHeader("sync.import.other".t(context)),
                     const SizedBox(height: 8.0),
-                    ListTile(
-                      leading: ClipRRect(
-                        borderRadius: const .all(Radius.circular(4.0)),
-                        child: Image.asset(
-                          "assets/images/external/ivy_wallet.png",
-                          width: IconTheme.of(context).size,
-                          height: IconTheme.of(context).size,
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        children: [
+                          ActionCard(
+                            customIcon: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEFF6FF),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+                                child: Image.asset(
+                                  "assets/images/external/ivy_wallet.png",
+                                  width: 24.0,
+                                  height: 24.0,
+                                ),
+                              ),
+                            ),
+                            title: "Ivy Wallet (CSV)",
+                            onTap: () => initiateImport(
+                              externalFormat: ImportExternalFormat.ivyWallet,
+                            ),
+                          ),
+                          const SizedBox(height: 12.0),
+                          ActionCard(
+                            customIcon: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEFF6FF),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: Icon(
+                                SimpleIcons.googlesheets,
+                                size: 24.0,
+                                color: const Color(0xFF2563EB),
+                              ),
+                            ),
+                            title: "sync.import.getCSVTemplate".t(context),
+                            onTap: () => openUrl(csvImportTemplateUrl),
+                          ),
+                        ],
                       ),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      title: Text("Ivy Wallet (CSV)"),
-                      onTap: () => initiateImport(
-                        externalFormat: ImportExternalFormat.ivyWallet,
-                      ),
-                    ),
-                    ListTile(
-                      leading: Icon(SimpleIcons.googlesheets),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      title: Text("sync.import.getCSVTemplate".t(context)),
-                      onTap: () => openUrl(csvImportTemplateUrl),
                     ),
                   ],
                 ),

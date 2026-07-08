@@ -62,14 +62,16 @@ class _SpendingCalendarPageState extends State<SpendingCalendarPage>
                   crossAxisAlignment: .start,
                   children: [
                     const SizedBox(height: 16.0),
-                    Frame(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: TimeRangeSelector(
                         initialValue: range,
                         onChanged: _updateRange,
                       ),
                     ),
-                    const SizedBox(height: 16.0),
-                    Frame(
+                    const SizedBox(height: 24.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
                         crossAxisAlignment: .start,
                         children: [
@@ -78,21 +80,27 @@ class _SpendingCalendarPageState extends State<SpendingCalendarPage>
                               context,
                               range.format(useRelative: false),
                             ),
-                            style: context.textTheme.titleSmall?.semi(context),
+                            style: context.textTheme.titleMedium?.semi(context).copyWith(
+                                  color: const Color(0xFF475569),
+                                ),
                           ),
-                          const SizedBox(height: 2.0),
+                          const SizedBox(height: 4.0),
                           MoneyText(
                             Money(total, primaryCurrency),
-                            style: context.textTheme.displaySmall,
+                            style: context.textTheme.displaySmall?.copyWith(
+                              color: const Color(0xFF0F172A),
+                              fontWeight: FontWeight.w600,
+                            ),
                             autoSize: true,
                             tapToToggleAbbreviation: true,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16.0),
+                    const SizedBox(height: 24.0),
                     if (hasData)
-                      Frame(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: SpendingHeatmap(
                           dailyExpense: dailyExpense,
                           from: from,

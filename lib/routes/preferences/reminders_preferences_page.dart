@@ -72,19 +72,27 @@ class _RemindersPreferencesPageState extends State<RemindersPreferencesPage> {
                   if (flowDebugMode ||
                       NotificationsService.schedulingSupported) ...[
                     const SizedBox(height: 16.0),
-                    SwitchListTile(
-                      title: Text(
-                        "preferences.reminders.remindDaily".t(context),
-                      ),
-                      subtitle: Text(
-                        "preferences.reminders.remindDaily.description".t(
-                          context,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Material(
+                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(12.0),
+                        clipBehavior: Clip.antiAlias,
+                        child: SwitchListTile(
+                          title: Text(
+                            "preferences.reminders.remindDaily".t(context),
+                          ),
+                          subtitle: Text(
+                            "preferences.reminders.remindDaily.description".t(
+                              context,
+                            ),
+                          ),
+                          value: enabled,
+                          onChanged: permissions.hasAllPermissions
+                              ? toggleRemindDaily
+                              : null,
                         ),
                       ),
-                      value: enabled,
-                      onChanged: permissions.hasAllPermissions
-                          ? toggleRemindDaily
-                          : null,
                     ),
                     if (permissions.hasAllPermissions && enabled) ...[
                       const SizedBox(height: 16.0),

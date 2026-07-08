@@ -1,5 +1,4 @@
 import "package:flow/l10n/flow_localizations.dart";
-import "package:flow/theme/helpers.dart";
 import "package:flow/widgets/general/button.dart";
 import "package:flow/utils/time_and_range.dart";
 import "package:flutter/gestures.dart";
@@ -59,7 +58,7 @@ class _TimeRangeSelectorState extends State<TimeRangeSelector> {
     final TextDirection textDirection = Directionality.of(context);
 
     return Container(
-      color: context.colorScheme.surface,
+      color: Colors.transparent,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -10,6 +10,7 @@ import "package:flow/entity/category.dart";
 import "package:flow/l10n/extensions.dart";
 import "package:flow/main.dart";
 import "package:flow/theme/primary_colors.dart";
+import "package:flow/theme/helpers.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/widgets/general/money_text.dart";
 import "package:flow/widgets/home/stats/pie_percent_badge.dart";
@@ -85,9 +86,18 @@ class _GroupPieChartState<T> extends State<GroupPieChart<T>> {
         const SizedBox(height: 16.0),
         Text(
           "tabs.stats.chart.total".t(context),
-          style: context.textTheme.labelMedium,
+          style: context.textTheme.titleMedium?.semi(context).copyWith(
+                color: const Color(0xFF475569),
+              ),
         ),
-        MoneyText(totalAmount, style: context.textTheme.headlineMedium),
+        const SizedBox(height: 4.0),
+        MoneyText(
+          totalAmount,
+          style: context.textTheme.displaySmall?.copyWith(
+            color: const Color(0xFF0F172A),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         Padding(
           padding: widget.chartPadding,
           child: ConstrainedBox(
@@ -101,15 +111,14 @@ class _GroupPieChartState<T> extends State<GroupPieChart<T>> {
                 builder: (context, constraints) {
                   final double size = constraints.maxWidth;
 
-                  final double centerHoleDiameter = math.max(
-                    size * 0.5,
-                    GroupPieChart.graphHoleSizeMin,
-                  );
-                  final double radius = (size - centerHoleDiameter) * 0.5;
+                  final double radius = math.min(40.0, size * 0.15);
+                  final double centerHoleDiameter = size - (radius * 2);
 
                   return Stack(
                     children: [
                       PieChart(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOutCubic,
                         PieChartData(
                           pieTouchData: PieTouchData(
                             touchCallback: (event, response) {
@@ -138,7 +147,7 @@ class _GroupPieChartState<T> extends State<GroupPieChart<T>> {
                               }
                             },
                           ),
-                          sectionsSpace: 1.0,
+                          sectionsSpace: 0.0,
                           centerSpaceRadius: centerHoleDiameter / 2,
                           startDegreeOffset: -90.0,
                           sections: data.entries.indexed
@@ -171,12 +180,19 @@ class _GroupPieChartState<T> extends State<GroupPieChart<T>> {
                                     textAlign: TextAlign.center,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
+                                    style: context.textTheme.titleMedium?.semi(context).copyWith(
+                                          color: const Color(0xFF475569),
+                                        ),
                                   ),
+                                  const SizedBox(height: 4.0),
                                   MoneyText(
                                     selectedSectionTotal,
                                     displayAbsoluteAmount: true,
                                     textAlign: TextAlign.center,
-                                    style: context.textTheme.headlineSmall,
+                                    style: context.textTheme.headlineMedium?.copyWith(
+                                      color: const Color(0xFF0F172A),
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -212,7 +228,7 @@ class _GroupPieChartState<T> extends State<GroupPieChart<T>> {
 
     return PieChartSectionData(
       color: color,
-      radius: radius,
+      radius: selected ? radius + 8.0 : radius,
       value: data.displayTotal,
       title: resolveName(data.associatedData),
       showTitle: false,
@@ -225,9 +241,7 @@ class _GroupPieChartState<T> extends State<GroupPieChart<T>> {
             )
           : null,
       badgePositionPercentageOffset: 0.8,
-      borderSide: selected
-          ? BorderSide(color: backgroundColor, width: 3.0)
-          : null,
+      borderSide: null,
     );
   }
 
