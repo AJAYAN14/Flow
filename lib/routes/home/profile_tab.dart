@@ -6,7 +6,7 @@ import "package:flow/objectbox.dart";
 import "package:flow/prefs/local_preferences.dart";
 import "package:flow/services/exchange_rates.dart";
 import "package:flow/services/notifications.dart";
-import "package:flow/services/sync/icloud_syncer.dart";
+
 import "package:flow/services/transactions.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/utils/utils.dart";
@@ -32,7 +32,6 @@ class ProfileTab extends StatefulWidget {
 class _ProfileTabState extends State<ProfileTab> {
   bool _debugDbBusy = false;
   bool _debugPrefsBusy = false;
-  bool _debugICloudBusy = false;
 
   @override
   Widget build(BuildContext context) {
@@ -149,13 +148,6 @@ class _ProfileTabState extends State<ProfileTab> {
                 ),
                 const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
                 PremiumListTile(
-                  title: Text("debug.iCloudDebugExplorer".t(context)),
-                  leading: Symbols.cloud_rounded,
-                  accent: const Color(0xFF94A3B8),
-                  onTap: () => context.push("/_debug/iCloud"),
-                ),
-                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
-                PremiumListTile(
                   title: Text("debug.scheduleDebugNotification".t(context)),
                   leading: Symbols.notification_add_rounded,
                   accent: const Color(0xFF94A3B8),
@@ -221,13 +213,6 @@ class _ProfileTabState extends State<ProfileTab> {
                 ),
                 const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
                 PremiumListTile(
-                  title: Text("debug.purgeICloudDebugFolder".t(context)),
-                  leading: Symbols.adb_rounded,
-                  accent: const Color(0xFF94A3B8),
-                  onTap: () => debugPurgeICloud(),
-                ),
-                const Divider(height: 1.0, indent: 64.0, color: Color(0xFFF1F5F9)),
-                PremiumListTile(
                   title: Text("debug.jumpToSetupPage".t(context)),
                   leading: Symbols.settings_rounded,
                   accent: const Color(0xFF94A3B8),
@@ -288,41 +273,6 @@ class _ProfileTabState extends State<ProfileTab> {
 
       _debugDbBusy = false;
 
-      if (mounted) {
-        setState(() {});
-      }
-    }
-  }
-
-  void debugPurgeICloud() async {
-    if (_debugICloudBusy) return;
-    setState(() {
-      _debugICloudBusy = true;
-    });
-    final bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("debug.purgeICloudDebugFolderConfirm".t(context)),
-        actions: [
-          Button(
-            onTap: () => context.pop(true),
-            child: Text("debug.confirmDelete".t(context)),
-          ),
-          Button(onTap: () => context.pop(false), child: Text("general.cancel".t(context))),
-        ],
-      ),
-    );
-
-    if (confirm != true) return;
-
-    try {
-      final int deletedCount = await ICloudSyncer().debugPurge();
-
-      if (mounted) {
-        context.showToast(text: "debug.deletedDebugItems".t(context, deletedCount.toString()));
-      }
-    } finally {
-      _debugICloudBusy = false;
       if (mounted) {
         setState(() {});
       }

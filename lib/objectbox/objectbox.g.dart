@@ -443,7 +443,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(10, 7829328581176695647),
     name: 'UserPreferences',
-    lastPropertyId: const obx_int.IdUid(30, 5353888497210708730),
+    lastPropertyId: const obx_int.IdUid(31, 6456840366751357862),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -613,6 +613,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(30, 5353888497210708730),
         name: 'homePendingTransactionsTimeRangeSerialized',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(31, 6456840366751357862),
+        name: 'autoBackupRetentionDays',
+        type: 6,
         flags: 0,
       ),
     ],
@@ -1626,7 +1632,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
             : fbb.writeString(
                 object.homePendingTransactionsTimeRangeSerialized!,
               );
-        fbb.startTable(31);
+        fbb.startTable(32);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
         fbb.addBool(2, object.combineTransfers);
@@ -1655,6 +1661,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(27, object.privacyModeUponShaking);
         fbb.addBool(28, object.transactionListTileShowExternalSource);
         fbb.addOffset(29, homePendingTransactionsTimeRangeSerializedOffset);
+        fbb.addInt64(30, object.autoBackupRetentionDays);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1724,6 +1731,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
             .vTableGetNullable(buffer, rootOffset, 38);
         final autoBackupIntervalInHoursParam = const fb.Int64Reader()
             .vTableGetNullable(buffer, rootOffset, 22);
+        final autoBackupRetentionDaysParam = const fb.Int64Reader()
+            .vTableGetNullable(buffer, rootOffset, 64);
         final icuCurrencyFormattingPatternParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 30);
@@ -1777,6 +1786,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 enableICloudSync: enableICloudSyncParam,
                 iCloudBackupsToKeep: iCloudBackupsToKeepParam,
                 autoBackupIntervalInHours: autoBackupIntervalInHoursParam,
+                autoBackupRetentionDays: autoBackupRetentionDaysParam,
                 icuCurrencyFormattingPattern: icuCurrencyFormattingPatternParam,
                 primaryCurrency: primaryCurrencyParam,
                 primaryAccountUuid: primaryAccountUuidParam,
@@ -2645,6 +2655,10 @@ class UserPreferences_ {
   /// See [UserPreferences.homePendingTransactionsTimeRangeSerialized].
   static final homePendingTransactionsTimeRangeSerialized =
       obx.QueryStringProperty<UserPreferences>(_entities[6].properties[27]);
+
+  /// See [UserPreferences.autoBackupRetentionDays].
+  static final autoBackupRetentionDays =
+      obx.QueryIntegerProperty<UserPreferences>(_entities[6].properties[28]);
 }
 
 /// [Budget] entity fields to define ObjectBox queries.

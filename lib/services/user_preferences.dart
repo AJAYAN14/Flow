@@ -38,12 +38,6 @@ class UserPreferencesService {
     ObjectBox().box<UserPreferences>().put(value);
   }
 
-  bool get enableICloudSync => value.enableICloudSync;
-  set enableICloudSync(bool newEnableICloudSync) {
-    value.enableICloudSync = newEnableICloudSync;
-    ObjectBox().box<UserPreferences>().put(value);
-  }
-
 
 
   PendingTimeRange get homePendingTransactionsTimeRange =>
@@ -79,14 +73,6 @@ class UserPreferencesService {
     ObjectBox().box<UserPreferences>().put(value);
   }
 
-  int? get iCloudBackupsToKeep => value.iCloudBackupsToKeep;
-  set iCloudBackupsToKeep(int? newICloudBackupsToKeep) {
-    if (newICloudBackupsToKeep == null) return;
-
-    value.trashBinRetentionDays = newICloudBackupsToKeep;
-
-    ObjectBox().box<UserPreferences>().put(value);
-  }
 
   int? get autoBackupIntervalInHours => value.autoBackupIntervalInHours;
   set autoBackupIntervalInHours(int? newAutobackupIntervalInHours) {
@@ -103,6 +89,21 @@ class UserPreferencesService {
 
     SyncService().triggerAutoBackup();
   }
+
+  int? get autoBackupRetentionDays => value.autoBackupRetentionDays;
+  set autoBackupRetentionDays(int? newAutoBackupRetentionDays) {
+    if (newAutoBackupRetentionDays == null) {
+      value.autoBackupRetentionDays = null;
+    } else {
+      value.autoBackupRetentionDays = min(
+        max(1, newAutoBackupRetentionDays),
+        3650,
+      );
+    }
+
+    ObjectBox().box<UserPreferences>().put(value);
+  }
+
 
   int? get scansPendingThresholdInHours => value.scansPendingThresholdInHours;
   set scansPendingThresholdInHours(int? newScansPendingThresholdInHours) {

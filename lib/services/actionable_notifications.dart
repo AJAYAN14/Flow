@@ -5,7 +5,7 @@ import "package:flow/entity/backup_entry.dart";
 import "package:flow/objectbox.dart";
 import "package:flow/objectbox/objectbox.g.dart";
 import "package:flow/prefs/local_preferences.dart";
-import "package:flow/services/sync/icloud_syncer.dart";
+
 import "package:flow/services/user_preferences.dart";
 import "package:flow/utils/should_execute_scheduled_task.dart";
 import "package:flutter/foundation.dart";
@@ -95,12 +95,6 @@ class ActionableNotificationsService {
     }
 
 
-
-    if (ICloudSyncer.supported &&
-        !UserPreferencesService().enableICloudSync &&
-        (UserPreferencesService().autoBackupIntervalInHours ?? 0) > 0) {
-      add(TurnOnICloudNotification());
-    }
   }
 
   ActionableNotificationsService._internal() {
@@ -109,7 +103,6 @@ class ActionableNotificationsService {
 
   void tryAddAutoBackupReminder() {
     // If user have set up any type of auto-save, no there's no point in reminding
-    if (UserPreferencesService().enableICloudSync) return;
 
     try {
       final String? savedPath = TransitiveLocalPreferences()

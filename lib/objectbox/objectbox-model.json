@@ -352,7 +352,7 @@
     },
     {
       "id": "10:7829328581176695647",
-      "lastPropertyId": "30:5353888497210708730",
+      "lastPropertyId": "31:6456840366751357862",
       "name": "UserPreferences",
       "properties": [
         {
@@ -497,6 +497,11 @@
           "id": "30:5353888497210708730",
           "name": "homePendingTransactionsTimeRangeSerialized",
           "type": 9
+        },
+        {
+          "id": "31:6456840366751357862",
+          "name": "autoBackupRetentionDays",
+          "type": 6
         }
       ],
       "relations": []

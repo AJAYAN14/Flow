@@ -5,10 +5,7 @@ import "package:flow/entity/backup_entry.dart";
 import "package:flow/l10n/extensions.dart";
 import "package:flow/l10n/named_enum.dart";
 import "package:flow/objectbox/actions.dart";
-import "package:flow/services/sync/icloud_syncer.dart";
-import "package:flow/services/sync/syncer.dart";
 import "package:flow/theme/theme.dart";
-import "package:flow/utils/extensions/backup_entry.dart";
 import "package:flow/utils/utils.dart";
 import "package:flow/widgets/general/directional_slidable.dart";
 import "package:flow/widgets/general/flow_icon.dart";
@@ -51,7 +48,6 @@ class _BackupEntryCardState extends State<BackupEntryCard> {
   @override
   Widget build(BuildContext context) {
     final int? fileSize = getFileSize();
-    final bool existsOnCloud = widget.entry.correspondingICloudFile != null;
 
     final Widget listTile = InkWell(
       borderRadius: widget.borderRadius,
@@ -72,23 +68,7 @@ class _BackupEntryCardState extends State<BackupEntryCard> {
                         plated: true,
                       ),
                     ),
-                    if (existsOnCloud)
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: EdgeInsets.all(2.0),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: context.colorScheme.surface.withAlpha(0xC0),
-                          ),
-                          child: Icon(
-                            Symbols.cloud_done_rounded,
-                            color: context.flowColors.income,
-                            size: 24.0,
-                          ),
-                        ),
-                      ),
+
                   ],
                 ),
                 const SizedBox(width: 12.0),
@@ -129,7 +109,7 @@ class _BackupEntryCardState extends State<BackupEntryCard> {
 
                     return IconButton(
                       onPressed: _busyDownloading ? null : onDownload,
-                      icon: (existsOnCloud || fileSize != null)
+                      icon: (fileSize != null)
                           ? const Icon(Symbols.save_alt_rounded)
                           : Icon(
                               Symbols.error_circle_rounded,
@@ -153,17 +133,7 @@ class _BackupEntryCardState extends State<BackupEntryCard> {
       ),
     );
 
-    final List<SlidableAction> startActions = [
-      if (fileSize != null &&
-          fileSize > 0 &&
-          widget.onUpload != null &&
-          widget.entry.correspondingICloudFile == null)
-        SlidableAction(
-          onPressed: (context) => widget.onUpload!(),
-          icon: Symbols.cloud_upload_rounded,
-          backgroundColor: context.flowColors.income,
-        ),
-    ];
+    final List<SlidableAction> startActions = [];
 
     final List<SlidableAction> endActions = [
       SlidableAction(
@@ -187,17 +157,13 @@ class _BackupEntryCardState extends State<BackupEntryCard> {
       context,
     );
 
-    final confirmation =
-        (widget.entry.correspondingICloudFile == null && getFileSize() == null)
+    final confirmation = getFileSize() == null
         ? true
         : await context.showConfirmationSheet(
             isDeletionConfirmation: true,
             title: "general.delete.confirmName".t(context, title),
             child: Text(
-              (ICloudSyncer.supported &&
-                      widget.entry.correspondingICloudFile != null)
-                  ? "sync.export.deleteCloudBackupConfirmation".t(context)
-                  : "general.delete.permanentWarning".t(context),
+              "general.delete.permanentWarning".t(context),
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.flowColors.expense,
               ),
@@ -215,72 +181,11 @@ class _BackupEntryCardState extends State<BackupEntryCard> {
           }
         }),
       );
-
-      if (widget.entry.correspondingICloudFile != null &&
-          ICloudSyncer.supported) {
-        unawaited(
-          ICloudSyncer()
-              .delete(widget.entry.correspondingICloudFile!.relativePath)
-              .then((iCloudDeleted) {
-                if (context.mounted && !iCloudDeleted) {
-                  context.showErrorToast(
-                    error: "error.sync.fileDeleteFailed".t(context),
-                  );
-                }
-              }),
-        );
-      }
     }
   }
 
   Future<void> onDownload() async {
-    String? fileToShare;
-
-    // _busyDownloading
-
-    final SyncerItem? syncerItem = widget.entry.correspondingICloudFile == null
-        ? null
-        : SyncerItem(
-            path: widget.entry.correspondingICloudFile!.relativePath,
-            updatedAt: widget.entry.createdDate,
-          );
-
-    if (syncerItem != null) {
-      if (_busyDownloading) {
-        return;
-      } else {
-        setState(() {
-          _busyDownloading = true;
-        });
-        try {
-          final File? downloadedFile = await ICloudSyncer().download(
-            syncerItem,
-            onProgress: (progress) {
-              _downloadProgress = progress / 100.0;
-
-              if (mounted) {
-                setState(() {});
-              }
-            },
-          );
-
-          fileToShare = downloadedFile?.path;
-        } catch (error) {
-          if (mounted) {
-            context.showErrorToast(error: error);
-          }
-        } finally {
-          _busyDownloading = false;
-          _downloadProgress = 0.0;
-
-          if (mounted) {
-            setState(() {});
-          }
-        }
-      }
-    } else if (getFileSize() == null) {
-      fileToShare = widget.entry.filePath;
-    }
+    String? fileToShare = widget.entry.filePath;
 
     if (!mounted) return;
 
@@ -288,9 +193,7 @@ class _BackupEntryCardState extends State<BackupEntryCard> {
       await context.showFileShareSheet(
         subject: "sync.export.save.shareTitle".t(context, {
           "type": widget.entry.fileExt,
-          "date": (syncerItem?.inferredBackupDate ?? widget.entry.createdDate)
-              .toMoment()
-              .lll,
+          "date": widget.entry.createdDate.toMoment().lll,
         }),
         filePath: fileToShare,
       );
@@ -300,20 +203,6 @@ class _BackupEntryCardState extends State<BackupEntryCard> {
   }
 
   int? getFileSize() {
-    final int? localFileSize = widget.entry.getFileSizeSync();
-
-    if (localFileSize != null) {
-      return localFileSize;
-    }
-
-    if (!ICloudSyncer.supported) {
-      return null;
-    }
-
-    try {
-      return widget.entry.correspondingICloudFile?.sizeInBytes;
-    } catch (e) {
-      return null;
-    }
+    return widget.entry.getFileSizeSync();
   }
 }

@@ -38,6 +38,8 @@ UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
             (json['iCloudBackupsToKeep'] as num?)?.toInt() ?? 10,
         autoBackupIntervalInHours:
             (json['autoBackupIntervalInHours'] as num?)?.toInt() ?? 72,
+        autoBackupRetentionDays:
+            (json['autoBackupRetentionDays'] as num?)?.toInt() ?? 30,
         icuCurrencyFormattingPattern:
             json['icuCurrencyFormattingPattern'] as String?,
         primaryCurrency: json['primaryCurrency'] as String?,
@@ -82,6 +84,7 @@ Map<String, dynamic> _$UserPreferencesToJson(
   'primaryCurrency': instance.primaryCurrency,
   'primaryAccountUuid': instance.primaryAccountUuid,
   'autoBackupIntervalInHours': instance.autoBackupIntervalInHours,
+  'autoBackupRetentionDays': instance.autoBackupRetentionDays,
   'enableICloudSync': instance.enableICloudSync,
   'iCloudBackupsToKeep': instance.iCloudBackupsToKeep,
   'transactionButtonOrderJoined': instance.transactionButtonOrderJoined,

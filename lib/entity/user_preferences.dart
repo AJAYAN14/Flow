@@ -90,6 +90,9 @@ class UserPreferences implements EntityBase {
 
   /// In hours, set as `null` to disable
   int? autoBackupIntervalInHours;
+  
+  /// Number of days to keep automatic backups. Set as `null` to keep forever.
+  int? autoBackupRetentionDays;
 
   bool enableICloudSync;
 
@@ -184,6 +187,7 @@ class UserPreferences implements EntityBase {
     this.enableICloudSync = false,
     this.iCloudBackupsToKeep = 10,
     this.autoBackupIntervalInHours = 72,
+    this.autoBackupRetentionDays = 30,
     this.icuCurrencyFormattingPattern,
     this.primaryCurrency,
     this.primaryAccountUuid,

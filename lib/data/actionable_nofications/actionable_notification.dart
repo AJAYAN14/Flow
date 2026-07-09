@@ -23,17 +23,7 @@ abstract class ActionableNotification<T> {
   ActionableNotificationPriority get priority;
 }
 
-class TurnOnICloudNotification extends ActionableNotification<Null> {
-  @override
-  final FlowIconData icon = const IconFlowIcon(SimpleIcons.icloud);
 
-  @override
-  final Null payload = null;
-
-  @override
-  final ActionableNotificationPriority priority =
-      ActionableNotificationPriority.medium;
-}
 
 
 
