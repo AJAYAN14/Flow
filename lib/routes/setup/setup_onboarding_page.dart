@@ -12,6 +12,7 @@ import "package:go_router/go_router.dart";
 import "package:logging/logging.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
 import "package:moment_dart/moment_dart.dart";
+import "package:permission_handler/permission_handler.dart";
 import "package:simple_icons_flow/simple_icons_flow.dart";
 
 final Logger _log = Logger("SetupOnboardingPage");
@@ -25,8 +26,24 @@ class SetupOnboardingPage extends StatefulWidget {
 
 class _SetupOnboardingPageState extends State<SetupOnboardingPage> {
 
-
   bool busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermissions();
+  }
+
+  Future<void> _requestPermissions() async {
+    try {
+      await [
+        Permission.notification,
+        Permission.locationWhenInUse,
+      ].request();
+    } catch (e) {
+      _log.warning("Failed to request permissions on startup", e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
