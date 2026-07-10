@@ -9,6 +9,7 @@ class InfoCard extends StatelessWidget {
   final Widget? delta;
 
   final Widget? icon;
+  final Color? color;
 
   const InfoCard({
     super.key,
@@ -16,11 +17,13 @@ class InfoCard extends StatelessWidget {
     this.icon,
     this.money,
     this.delta,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Surface(
+      color: color,
       shape: RoundedRectangleBorder(borderRadius: .circular(16.0)),
       builder: (BuildContext context) => Container(
         width: double.infinity,
@@ -31,16 +34,18 @@ class InfoCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  title,
-                  style: context.textTheme.bodyMedium,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
                 if (icon != null) ...[
-                  const SizedBox(width: 4.0),
-                  IconTheme(data: IconThemeData(size: 20.0), child: icon!),
+                  IconTheme(data: const IconThemeData(size: 20.0), child: icon!),
+                  const SizedBox(width: 8.0),
                 ],
+                Flexible(
+                  child: Text(
+                    title,
+                    style: context.textTheme.bodyMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             ?money,

@@ -25,14 +25,15 @@ class _NewTransactionButtonState extends State<NewTransactionButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animationController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 500),
+    duration: const Duration(milliseconds: 200),
+    reverseDuration: const Duration(milliseconds: 200),
   );
   late final _bounceAnimation = Tween(begin: 0.0, end: (45.0 / 180) * pi)
       .animate(
         CurvedAnimation(
           parent: _animationController,
-          curve: Curves.easeOut,
-          reverseCurve: Curves.easeIn,
+          curve: Curves.easeOutBack,
+          reverseCurve: Curves.easeInBack,
         ),
       );
 

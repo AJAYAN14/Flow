@@ -72,23 +72,24 @@ class BentoTile extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6.0),
+                        width: 32.0,
+                        height: 32.0,
                         decoration: BoxDecoration(
-                          color: resolvedAccent.withAlpha(0x26), // 15% opacity for a nice pop
+                          color: resolvedAccent.withAlpha(0x26),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(icon, color: resolvedAccent, size: 16.0),
+                        child: Icon(icon, color: resolvedAccent, size: 18.0),
                       ),
-                      const SizedBox(width: 8.0),
+                      const SizedBox(width: 10.0),
                       Expanded(
                         child: Text(
-                          label.toUpperCase(),
+                          label,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: context.textTheme.labelSmall?.copyWith(
-                            color: const Color(0xFF64748B), // Slate 500
-                            letterSpacing: 0.6,
-                            fontWeight: FontWeight.w600,
+                          style: context.textTheme.titleSmall?.copyWith(
+                            color: const Color(0xFF374151), // HTML text-gray-700
+                            fontWeight: FontWeight.w600, // HTML font-semibold
+                            fontSize: 16.0,
                           ),
                         ),
                       ),
@@ -96,18 +97,15 @@ class BentoTile extends StatelessWidget {
                         const Icon(
                           Symbols.chevron_right_rounded,
                           size: 18.0,
-                          color: Color(0xFF94A3B8), // Slate 400
+                          color: Color(0xFF9CA3AF), // HTML text-gray-400
                         ),
                     ],
                   ),
-                  const SizedBox(height: 10.0),
+                  const SizedBox(height: 12.0),
                   Expanded(
                     child: busy
                         ? const Spinner.center()
-                        : Align(
-                            alignment: AlignmentDirectional.topStart,
-                            child: child,
-                          ),
+                        : child,
                   ),
                 ],
               ),

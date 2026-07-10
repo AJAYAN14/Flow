@@ -50,10 +50,10 @@ class _PaceTileState extends State<PaceTile>
             report.expenseSum.amount.abs() <= 0);
 
     return BentoTile(
-      accent: const Color(0xFFF59E0B), // Amber
+      accent: const Color(0xFFF97316), // Orange
       label: "tabs.stats.analytics.pace".t(context),
       icon: Symbols.speed_rounded,
-      height: 160.0,
+      height: 170.0,
       busy: busy && !loaded,
       onTap: () => context.push("/stats/cash-flow"),
       child: empty
@@ -73,69 +73,82 @@ class _PaceTileState extends State<PaceTile>
         : report.expenseSum;
 
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           (forecasting
                   ? "tabs.stats.analytics.pace.projected"
                   : "tabs.stats.analytics.pace.totalSpent")
               .t(context),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: context.textTheme.labelMedium?.semi(context),
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: const Color(0xFF6B7280), // HTML text-gray-500
+            fontSize: 14.0, // HTML text-sm
+          ),
         ),
-        const SizedBox(height: 2.0),
+        const SizedBox(height: 4.0), // HTML mb-1
         Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
           children: [
-            Expanded(
+            Flexible(
               child: MoneyText(
                 headline,
                 displayAbsoluteAmount: true,
-                style: context.textTheme.titleLarge?.copyWith(
-                  color: context.flowColors.expense,
-                  fontWeight: FontWeight.w700,
+                style: context.textTheme.headlineLarge?.copyWith(
+                  color: const Color(0xFFDE2D26),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 28.0,
+                  height: 1.0,
+                  letterSpacing: -0.5,
                 ),
                 autoSize: true,
                 initiallyAbbreviated: true,
               ),
             ),
-            if (report.previousExpenseSum != null) ...[
+            if (this.report?.previousExpenseSum != null) ...[
               const SizedBox(width: 8.0),
               Trend.fromMoney(
                 current: headline,
-                previous: report.previousExpenseSum,
+                previous: this.report!.previousExpenseSum,
               ),
             ],
           ],
         ),
         const Spacer(),
-        Row(
-          mainAxisAlignment: .spaceBetween,
-          children: [
-            Flexible(
-              child: Text(
-                "tabs.stats.analytics.pace.perDay".t(context),
-                maxLines: 1,
-                softWrap: false,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.bodySmall?.semi(context),
-              ),
-            ),
-            const SizedBox(width: 8.0),
-            Flexible(
-              child: MoneyText(
-                report.dailyAvgExpenditure,
-                displayAbsoluteAmount: true,
-                style: context.textTheme.titleSmall?.copyWith(
-                  color: context.flowColors.expense,
-                  fontWeight: FontWeight.w600,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "tabs.stats.analytics.pace.perDay".t(context),
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFF6B7280),
+                    fontSize: 13.0,
+                  ),
                 ),
-                autoSize: true,
-                initiallyAbbreviated: true,
-                textAlign: TextAlign.end,
-              ),
+                const SizedBox(width: 12.0),
+                MoneyText(
+                  report.dailyAvgExpenditure,
+                  displayAbsoluteAmount: true,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: const Color(0xFFDE2D26),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13.0,
+                  ),
+                  autoSize: false,
+                  initiallyAbbreviated: true,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ],
     );

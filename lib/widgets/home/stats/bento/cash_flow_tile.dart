@@ -8,8 +8,6 @@ import "package:flow/utils/extensions.dart";
 import "package:flow/utils/primary_currency_dependent_state.dart";
 import "package:flow/widgets/general/money_text.dart";
 import "package:flow/widgets/home/stats/bento/bento_tile.dart";
-import "package:flow/widgets/stats/cash_flow/cash_flow_figure.dart";
-import "package:flow/widgets/stats/cash_flow/cash_flow_flow_bar.dart";
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
@@ -49,13 +47,13 @@ class _CashFlowTileState extends State<CashFlowTile>
 
     final Color netColor = saved
         ? context.flowColors.income
-        : context.flowColors.expense;
+        : const Color(0xFFDE2D26); // HTML text-[#de2d26]
 
     return BentoTile(
       accent: const Color(0xFF10B981), // Emerald
       label: "tabs.stats.analytics.cashFlow".t(context),
       icon: Symbols.swap_vert_rounded,
-      height: 160.0,
+      height: 170.0,
       busy: busy && !loaded,
       onTap: () => context.push("/stats/cash-flow"),
       child: empty
@@ -64,86 +62,121 @@ class _CashFlowTileState extends State<CashFlowTile>
               style: context.textTheme.bodySmall?.semi(context),
             )
           : Column(
-              crossAxisAlignment: .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                LayoutBuilder(
-                  builder: (context, constraints) => Row(
-                    crossAxisAlignment: .center,
-                    children: [
-                      Icon(
-                        saved
-                            ? Symbols.savings_rounded
-                            : Symbols.trending_down_rounded,
-                        color: netColor,
-                        size: 18.0,
-                      ),
-                      const SizedBox(width: 6.0),
-                      // Cap the label so a long localized "Overspent"
-                      // ellipsizes instead of overflowing the narrow tile; the
-                      // net figure keeps the rest and stays pinned right.
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth * 0.55,
-                        ),
-                        child: Text(
-                          (saved
-                                  ? "tabs.stats.analytics.saved"
-                                  : "tabs.stats.analytics.overspent")
-                              .t(context),
-                          maxLines: 1,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
-                          style: context.textTheme.labelMedium?.semi(context),
-                        ),
-                      ),
-                      const SizedBox(width: 8.0),
-                      Expanded(
-                        child: MoneyText(
-                          Money(saved ? net : -net, primaryCurrency),
-                          style: context.textTheme.titleLarge?.copyWith(
-                            color: netColor,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          autoSize: true,
-                          initiallyAbbreviated: true,
-                          textAlign: TextAlign.end,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12.0),
-                CashFlowFlowBar(income: income, expense: expense),
-                const SizedBox(height: 8.0),
-                // Each figure claims half the row and scales down rather than
-                // overflowing when the tile is narrow (e.g. paired with Pace).
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: FittedBox(
-                        fit: .scaleDown,
-                        alignment: AlignmentDirectional.centerStart,
-                        child: CashFlowFigure(
-                          label: "tabs.stats.analytics.in".t(context),
-                          money: Money(income, primaryCurrency),
-                          color: context.flowColors.income,
-                        ),
-                      ),
+                    Icon(
+                      saved
+                          ? Symbols.trending_up_rounded
+                          : Symbols.trending_down_rounded,
+                      color: netColor,
+                      size: 16.0,
                     ),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: FittedBox(
-                        fit: .scaleDown,
-                        alignment: AlignmentDirectional.centerEnd,
-                        child: CashFlowFigure(
-                          label: "tabs.stats.analytics.out".t(context),
-                          money: Money(expense, primaryCurrency),
-                          color: context.flowColors.expense,
-                          alignEnd: true,
-                        ),
+                    const SizedBox(width: 6.0), // HTML gap-1.5
+                    Text(
+                      (saved
+                              ? "tabs.stats.analytics.saved"
+                              : "tabs.stats.analytics.overspent")
+                          .t(context),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFF6B7280), // HTML text-gray-500
+                        fontSize: 14.0, // HTML text-sm
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 4.0), // HTML mb-1
+                MoneyText(
+                  Money(saved ? net : -net, primaryCurrency),
+                  style: context.textTheme.headlineLarge?.copyWith(
+                    color: netColor,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 28.0,
+                    height: 1.0,
+                    letterSpacing: -0.5,
+                  ),
+                  autoSize: true,
+                  initiallyAbbreviated: true,
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9FAFB), // HTML bg-gray-50
+                    borderRadius: BorderRadius.circular(12.0), // HTML rounded-xl
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 6.0,
+                          height: 6.0,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF10B981),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6.0),
+                        Text(
+                          "tabs.stats.analytics.in".t(context),
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: const Color(0xFF6B7280),
+                            fontSize: 13.0,
+                          ),
+                        ),
+                        const SizedBox(width: 6.0),
+                        MoneyText(
+                          Money(income, primaryCurrency),
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: const Color(0xFF059669),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13.0,
+                          ),
+                          autoSize: false,
+                          initiallyAbbreviated: true,
+                        ),
+                        const SizedBox(width: 12.0),
+                        Container(
+                          width: 1.0,
+                          height: 12.0,
+                          color: const Color(0xFFD1D5DB),
+                        ),
+                        const SizedBox(width: 12.0),
+                        Container(
+                          width: 6.0,
+                          height: 6.0,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEF4444),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6.0),
+                        Text(
+                          "tabs.stats.analytics.out".t(context),
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: const Color(0xFF6B7280),
+                            fontSize: 13.0,
+                          ),
+                        ),
+                        const SizedBox(width: 6.0),
+                        MoneyText(
+                          Money(expense, primaryCurrency),
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: const Color(0xFFDE2D26),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13.0,
+                          ),
+                          autoSize: false,
+                          initiallyAbbreviated: true,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
