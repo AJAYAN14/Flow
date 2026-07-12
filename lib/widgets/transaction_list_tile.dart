@@ -61,6 +61,9 @@ class TransactionListTile extends StatelessWidget {
   /// preview — e.g. projected recurring occurrences that aren't real entries.
   final bool preview;
 
+  final bool isFirstInGroup;
+  final bool isLastInGroup;
+
   const TransactionListTile({
     super.key,
     required this.transaction,
@@ -77,6 +80,8 @@ class TransactionListTile extends StatelessWidget {
     this.selected = false,
     this.onSelectionToggle,
     this.preview = false,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   });
 
   @override
@@ -169,17 +174,27 @@ class TransactionListTile extends StatelessWidget {
 
     final Widget listTile = Material(
       type: MaterialType.card,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: isFirstInGroup ? const Radius.circular(24.0) : Radius.zero,
+          bottom: isLastInGroup ? const Radius.circular(24.0) : Radius.zero,
+        ),
+      ),
       color: selected
           ? context.colorScheme.primary.withAlpha(0x20)
-          : kTransparent,
-      child: InkWell(
-        onTap: selectionActive
-            ? (onSelectionToggle ?? () {})
-            : () => context.push("/transaction/${transaction.id}"),
-        child: Padding(
-          padding: effectiveTheme.paddingOrDefault,
-          child: Column(
-            children: [
+          : Colors.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: selectionActive
+                ? (onSelectionToggle ?? () {})
+                : () => context.push("/transaction/${transaction.id}"),
+            child: Padding(
+              padding: effectiveTheme.paddingOrDefault,
+              child: Column(
+                children: [
               Row(
                 crossAxisAlignment: .start,
                 spacing: effectiveTheme.spacingOrDefault,
@@ -200,7 +215,10 @@ class TransactionListTile extends StatelessWidget {
                               ],
                               TextSpan(text: resolvedTitle),
                             ],
-                            style: context.textTheme.bodyMedium,
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: context.colorScheme.onSurface,
+                            ),
                           ),
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
@@ -276,7 +294,18 @@ class TransactionListTile extends StatelessWidget {
           ),
         ),
       ),
-    );
+      if (!isLastInGroup)
+        Padding(
+          padding: const EdgeInsets.only(left: 76.0),
+          child: Divider(
+            height: 1.0,
+            thickness: 0.5,
+            color: context.colorScheme.outlineVariant.withAlpha(0x40),
+          ),
+        ),
+    ],
+  ),
+);
 
     final List<SlidableAction> startActions = [
       if (showDuplicateButton)
@@ -318,16 +347,19 @@ class TransactionListTile extends StatelessWidget {
         ),
     ];
 
-    if (selectionActive) {
-      return KeyedSubtree(key: dismissibleKey, child: listTile);
-    }
+    final Widget result = selectionActive
+        ? KeyedSubtree(key: dismissibleKey, child: listTile)
+        : DirectionalSlidable(
+            key: dismissibleKey,
+            groupTag: "transaction_list_tile",
+            startActions: startActions,
+            endActions: endActions,
+            child: listTile,
+          );
 
-    return DirectionalSlidable(
-      key: dismissibleKey,
-      groupTag: "transaction_list_tile",
-      startActions: startActions,
-      endActions: endActions,
-      child: listTile,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: result,
     );
   }
 

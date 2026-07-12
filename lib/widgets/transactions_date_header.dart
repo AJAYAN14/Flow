@@ -121,46 +121,55 @@ class _TransactionListDateHeaderState extends State<TransactionListDateHeader> {
 
         return Row(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: .spaceBetween,
-          crossAxisAlignment: .center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
-              fit: FlexFit.tight,
-              child: Column(
-                crossAxisAlignment: .start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DefaultTextStyle(
-                    style: context.textTheme.headlineSmall!,
-                    child: title,
-                  ),
-                  MoneyTextBuilder(
-                    builder: (context, formattedSum, originalSum) => RichText(
-                      text: TextSpan(
-                        style: context.textTheme.labelMedium,
-                        children: [
-                          TextSpan(
-                            text: "$formattedSum$exclamation",
-                            style: showMissingExchangeRatesWarning
-                                ? TextStyle(color: context.colorScheme.error)
-                                : null,
-                          ),
-                          TextSpan(text: " • "),
-                          TextSpan(
-                            text: "tabs.home.transactionsCount".t(
-                              context,
-                              widget.transactions.renderableCount,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    money: mergedFlow.totalFlow,
-                  ),
-                ],
+              child: DefaultTextStyle(
+                style: context.textTheme.headlineSmall!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
+                ),
+                child: title,
               ),
             ),
-            if (widget.action != null) widget.action!,
+            const SizedBox(width: 16.0),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                MoneyTextBuilder(
+                  builder: (context, formattedSum, originalSum) => RichText(
+                    textAlign: TextAlign.right,
+                    text: TextSpan(
+                      style: context.textTheme.labelMedium?.copyWith(
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: "$formattedSum$exclamation",
+                          style: showMissingExchangeRatesWarning
+                              ? TextStyle(color: context.colorScheme.error)
+                              : null,
+                        ),
+                        const TextSpan(text: " • "),
+                        TextSpan(
+                          text: "tabs.home.transactionsCount".t(
+                            context,
+                            widget.transactions.renderableCount,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  money: mergedFlow.totalFlow,
+                ),
+                if (widget.action != null) ...[
+                  const SizedBox(width: 8.0),
+                  widget.action!,
+                ],
+              ],
+            ),
           ],
         );
       },
@@ -196,11 +205,8 @@ class _TransactionListDateHeaderState extends State<TransactionListDateHeader> {
 
   String _getRangeTitle() {
     return switch ((widget.range, rangeTitleAlternative)) {
-      (DayTimeRange dayTimeRange, false) =>
-        dayTimeRange.from.toMoment().calendar(omitHours: true),
-      (DayTimeRange dayTimeRange, true) => dayTimeRange.from.toMoment().format(
-        "ll",
-      ),
+      (DayTimeRange dayTimeRange, false) => dayTimeRange.from.toMoment().format("YYYY.M.D"),
+      (DayTimeRange dayTimeRange, true) => dayTimeRange.from.toMoment().format("ll"),
       (TimeRange other, _) => other.format(),
     };
   }

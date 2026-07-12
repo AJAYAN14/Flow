@@ -167,7 +167,7 @@ class _GroupedTransactionsListViewState
 
     final EdgeInsets headerPadding =
         widget.groupHeaderPadding ??
-        const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0);
+        const EdgeInsets.only(left: 16.0, right: 16.0, top: 24.0, bottom: 8.0);
 
     Widget itemBuilder(BuildContext context, int index) =>
         switch (flattened[index]) {
@@ -188,6 +188,8 @@ class _GroupedTransactionsListViewState
             enabled: widget.selectionController?.active != true,
             child: TransactionListTile(
               key: ValueKey(transaction.id),
+              isFirstInGroup: index == 0 || flattened[index - 1] is! Transaction,
+              isLastInGroup: index == flattened.length - 1 || flattened[index + 1] is! Transaction,
               combineTransfers: combineTransfers,
               transaction: transaction,
               dismissibleKey: ValueKey(transaction.id),
