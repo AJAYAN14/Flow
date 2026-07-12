@@ -76,7 +76,7 @@ class Navbar extends StatelessWidget {
                   NavbarButton(
                     index: 0,
                     label: "tabs.home".t(context),
-                    icon: Symbols.circle_rounded,
+                    icon: Symbols.home_rounded,
                     onTap: onTap,
                     activeIndex: activeIndex,
                   ),

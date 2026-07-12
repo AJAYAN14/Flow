@@ -1,6 +1,6 @@
-import "package:flow/data/money.dart";
+
 import "package:flow/entity/transaction/type.dart";
-import "package:flow/services/user_preferences.dart";
+
 import "package:flow/utils/loose_parsers.dart";
 import "package:flow/utils/money_parsing.dart";
 import "package:flow/utils/utils.dart";
@@ -21,6 +21,7 @@ class TransactionProgrammableObject {
   final String? notes;
   final List<String>? tagsUuids;
   final List<String>? tags;
+  final List<String>? extraTags;
   final double? lat;
   final double? lng;
 
@@ -49,6 +50,7 @@ class TransactionProgrammableObject {
     this.transferConversionRate,
     this.tagsUuids,
     this.tags,
+    this.extraTags,
     this.lat,
     this.lng,
   });
@@ -77,6 +79,9 @@ class TransactionProgrammableObject {
     }
     if (tags != null) {
       map["tags"] = tags!.join(",");
+    }
+    if (extraTags != null) {
+      map["extraTags"] = extraTags!.join(",");
     }
     if (lat != null) {
       map["lat"] = lat!.toString();
@@ -138,6 +143,7 @@ class TransactionProgrammableObject {
       transferConversionRate: looseDouble(params["transferConversionRate"]),
       tagsUuids: looseStringList(params["tagsUuids"]),
       tags: looseStringList(params["tags"]),
+      extraTags: looseStringList(params["extraTags"]),
       lat: looseDouble(params["lat"]),
       lng: looseDouble(params["lng"]),
     );
@@ -184,64 +190,4 @@ class TransactionProgrammableObject {
     }
   }
 
-  static TransactionProgrammableObject? fromEnyJson(Map json) {
-    String? itemsToNote(List<Map> items) {
-      return items
-          .map((item) {
-            try {
-              final itemMap = item as Map?;
-
-              if (itemMap == null) {
-                throw Exception("Invalid item format");
-              }
-
-              final String name = looseString(itemMap["name"]) ?? "An item";
-              final int quantity =
-                  looseDouble(itemMap["quantity"])?.toInt() ?? 1;
-              final double itemAmount = looseDouble(itemMap["amount"]) ?? 0.0;
-              final String? currency = looseString(itemMap["currency"]);
-
-              final String amountStr = Money(
-                itemAmount,
-                currency ?? UserPreferencesService().primaryCurrency,
-              ).formatted;
-
-              return "$quantity x $name - **${amountStr.trim()}**";
-            } catch (_) {
-              return null;
-            }
-          })
-          .whereType<String>()
-          .join("\n\n");
-    }
-
-    try {
-      final String title = looseString(json["merchant"]) ?? "Receipt from Eny";
-      final double? amount = looseDouble(json["total"]);
-      final DateTime transactionDate = switch (json["date"]) {
-        String dateString => DateTime.tryParse(dateString) ?? DateTime.now(),
-        _ => DateTime.now(),
-      };
-
-      final List<Map>? items = switch (json["items"]) {
-        Iterable itemList
-            when itemList.isNotEmpty && itemList.every((item) => item is Map) =>
-          itemList.cast<Map>().toList(),
-        _ => null,
-      };
-
-      final String notes = items == null
-          ? "Imported from Eny"
-          : "${itemsToNote(items)}\n\n---\n\nImported from Eny";
-      return TransactionProgrammableObject(
-        title: title,
-        amount: amount == null ? 0.0 : (-amount.abs()),
-        transactionDate: transactionDate,
-        notes: notes,
-        category: looseString(items?.firstOrNull?["category"]),
-      );
-    } catch (e) {
-      return null;
-    }
-  }
 }

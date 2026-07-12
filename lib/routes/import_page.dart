@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:io";
 
 import "package:cross_file/cross_file.dart";
@@ -5,6 +6,8 @@ import "package:flow/constants.dart";
 import "package:flow/l10n/extensions.dart";
 import "package:flow/sync/import.dart";
 import "package:flow/sync/import/base.dart";
+import "package:flow/sync/model/external/alipay/alipay_csv_parser.dart";
+import "package:flow/sync/model/external/wechat/wechat_csv_parser.dart";
 import "package:flow/utils/extensions/importer.dart";
 import "package:flow/utils/utils.dart";
 import "package:flow/widgets/action_card.dart";
@@ -12,8 +15,8 @@ import "package:flow/widgets/general/list_header.dart";
 import "package:flow/widgets/general/spinner.dart";
 import "package:flow/widgets/import/file_select_area.dart";
 import "package:flutter/material.dart";
+import "package:go_router/go_router.dart";
 import "package:logging/logging.dart";
-import "package:material_symbols_icons_flow/symbols.dart";
 import "package:simple_icons_flow/simple_icons_flow.dart";
 
 final Logger _log = Logger("ImportPage");
@@ -86,6 +89,40 @@ class _ImportPageState extends State<ImportPage> {
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               child: Icon(
+                                SimpleIcons.wechat,
+                                size: 24.0,
+                                color: const Color(0xFF07C160),
+                              ),
+                            ),
+                            title: "微信支付 (CSV)",
+                            onTap: initiateWechatImport,
+                          ),
+                          const SizedBox(height: 12.0),
+                          ActionCard(
+                            customIcon: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEFF6FF),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: Icon(
+                                SimpleIcons.alipay,
+                                size: 24.0,
+                                color: const Color(0xFF1677FF),
+                              ),
+                            ),
+                            title: "支付宝 (CSV)",
+                            onTap: initiateAlipayImport,
+                          ),
+                          const SizedBox(height: 12.0),
+                          ActionCard(
+                            customIcon: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEFF6FF),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: Icon(
                                 SimpleIcons.googlesheets,
                                 size: 24.0,
                                 color: const Color(0xFF2563EB),
@@ -132,6 +169,68 @@ class _ImportPageState extends State<ImportPage> {
       }
     } catch (e, stackTrace) {
       _log.severe("Importer error", e, stackTrace);
+      if (mounted) {
+        context.showErrorToast(error: e);
+      }
+    } finally {
+      busy = false;
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  Future<void> initiateWechatImport() async {
+    if (busy) return;
+
+    setState(() {
+      busy = true;
+    });
+
+    try {
+      final file = await pickImportFile();
+      if (file == null) {
+        if (mounted) context.showErrorToast(error: "error.input.noFilePicked".t(context));
+        return;
+      }
+      
+      final multiParams = await WechatCsvParser.parse(file);
+      if (mounted) {
+        unawaited(context.push("/transaction/batch-import", extra: multiParams));
+      }
+    } catch (e, stackTrace) {
+      _log.severe("Wechat import error", e, stackTrace);
+      if (mounted) {
+        context.showErrorToast(error: e);
+      }
+    } finally {
+      busy = false;
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  Future<void> initiateAlipayImport() async {
+    if (busy) return;
+
+    setState(() {
+      busy = true;
+    });
+
+    try {
+      final file = await pickImportFile();
+      if (file == null) {
+        if (mounted) context.showErrorToast(error: "error.input.noFilePicked".t(context));
+        return;
+      }
+      
+      final multiParams = await AlipayCsvParser.parse(file);
+      if (mounted) {
+        unawaited(context.push("/transaction/batch-import", extra: multiParams));
+      }
+    } catch (e, stackTrace) {
+      _log.severe("Alipay import error", e, stackTrace);
       if (mounted) {
         context.showErrorToast(error: e);
       }

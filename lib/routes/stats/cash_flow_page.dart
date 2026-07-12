@@ -6,9 +6,10 @@ import "package:flow/objectbox.dart";
 import "package:flow/objectbox/actions.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/utils/primary_currency_dependent_state.dart";
-import "package:flow/widgets/analytics/sankey_diagram.dart";
+// Remove sankey_diagram.dart import
 import "package:flow/widgets/general/frame.dart";
 import "package:flow/widgets/general/list_header.dart";
+import "package:flow/widgets/general/surface.dart";
 import "package:flow/widgets/general/spinner.dart";
 import "package:flow/widgets/home/stats/info_card_with_delta.dart";
 import "package:flow/widgets/stats/cash_flow/cash_flow_legend.dart";
@@ -42,8 +43,8 @@ class _CashFlowPageState extends State<CashFlowPage>
   bool missingRates = false;
   bool failed = false;
 
-  List<SankeyDatum> sources = [];
-  List<SankeyDatum> targets = [];
+  List<CashFlowDatum> sources = [];
+  List<CashFlowDatum> targets = [];
   double totalIncome = 0.0;
   double totalExpense = 0.0;
 
@@ -82,9 +83,14 @@ class _CashFlowPageState extends State<CashFlowPage>
                   children: [
                     const SizedBox(height: 16.0),
                     Frame(
-                      child: TimeRangeSelector(
-                        initialValue: range,
-                        onChanged: _updateRange,
+                      child: Surface(
+                        builder: (context) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          child: TimeRangeSelector(
+                            initialValue: range,
+                            onChanged: _updateRange,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16.0),
@@ -108,19 +114,36 @@ class _CashFlowPageState extends State<CashFlowPage>
                       )
                     else if (hasData) ...[
                       Frame(
-                        child: SankeyDiagram(
-                          sources: sources,
-                          targets: targets,
+                        child: Surface(
+                          builder: (context) => Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ListHeader("tabs.stats.analytics.income".t(context), padding: EdgeInsets.zero),
+                                const SizedBox(height: 16.0),
+                                CashFlowLegend(data: sources, currency: primaryCurrency, totalValue: totalIncome),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24.0),
-                      ListHeader("tabs.stats.analytics.income".t(context)),
-                      const SizedBox(height: 8.0),
-                      CashFlowLegend(data: sources, currency: primaryCurrency),
-                      const SizedBox(height: 16.0),
-                      ListHeader("tabs.stats.analytics.spending".t(context)),
-                      const SizedBox(height: 8.0),
-                      CashFlowLegend(data: targets, currency: primaryCurrency),
+                      Frame(
+                        child: Surface(
+                          builder: (context) => Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ListHeader("tabs.stats.analytics.spending".t(context), padding: EdgeInsets.zero),
+                                const SizedBox(height: 16.0),
+                                CashFlowLegend(data: targets, currency: primaryCurrency, totalValue: totalExpense),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ] else
                       StatsEmptyState(
                         message: "tabs.stats.analytics.cashFlow.empty".t(
@@ -236,8 +259,8 @@ class _CashFlowPageState extends State<CashFlowPage>
       final Color expenseColor = context.flowColors.expense;
       final List<Color> palette = context.chartAccents;
 
-      final List<SankeyDatum> incomeNodes = [];
-      final List<SankeyDatum> expenseNodes = [];
+      final List<CashFlowDatum> incomeNodes = [];
+      final List<CashFlowDatum> expenseNodes = [];
       double income = 0.0;
       double expense = 0.0;
       int colorIndex = 0;
@@ -259,24 +282,24 @@ class _CashFlowPageState extends State<CashFlowPage>
 
         if (incomeAmount > 0) {
           incomeNodes.add(
-            SankeyDatum(label: name, value: incomeAmount, color: color),
+            CashFlowDatum(label: name, value: incomeAmount, color: color),
           );
           income += incomeAmount;
         }
         if (expenseAmount > 0) {
           expenseNodes.add(
-            SankeyDatum(label: name, value: expenseAmount, color: color),
+            CashFlowDatum(label: name, value: expenseAmount, color: color),
           );
           expense += expenseAmount;
         }
       }
 
-      final List<SankeyDatum> nextSources = _bucket(
+      final List<CashFlowDatum> nextSources = _bucket(
         incomeNodes,
         _maxIncomeNodes,
         otherColor,
       );
-      final List<SankeyDatum> nextTargets = _bucket(
+      final List<CashFlowDatum> nextTargets = _bucket(
         expenseNodes,
         _maxExpenseNodes,
         otherColor,
@@ -288,7 +311,7 @@ class _CashFlowPageState extends State<CashFlowPage>
       final double threshold = (income > expense ? income : expense) * 0.001;
       if (net > threshold) {
         nextTargets.add(
-          SankeyDatum(
+          CashFlowDatum(
             label: "tabs.stats.analytics.saved".tr(),
             value: net,
             color: incomeColor,
@@ -296,7 +319,7 @@ class _CashFlowPageState extends State<CashFlowPage>
         );
       } else if (net < -threshold) {
         nextSources.add(
-          SankeyDatum(
+          CashFlowDatum(
             label: "tabs.stats.analytics.cashFlow.fromReserves".tr(),
             value: -net,
             color: expenseColor,
@@ -325,24 +348,24 @@ class _CashFlowPageState extends State<CashFlowPage>
   }
 
   /// Keeps the top [max] nodes by value and rolls the rest into "Other".
-  List<SankeyDatum> _bucket(
-    List<SankeyDatum> nodes,
+  List<CashFlowDatum> _bucket(
+    List<CashFlowDatum> nodes,
     int max,
     Color otherColor,
   ) {
-    final List<SankeyDatum> sorted = [...nodes]
+    final List<CashFlowDatum> sorted = [...nodes]
       ..sort((a, b) => b.value.compareTo(a.value));
 
     if (sorted.length <= max) return sorted;
 
-    final List<SankeyDatum> top = sorted.take(max - 1).toList();
+    final List<CashFlowDatum> top = sorted.take(max - 1).toList();
     final double otherSum = sorted
         .skip(max - 1)
         .fold(0.0, (sum, node) => sum + node.value);
 
     return [
       ...top,
-      SankeyDatum(
+      CashFlowDatum(
         label: "tabs.stats.analytics.other".tr(),
         value: otherSum,
         color: otherColor,

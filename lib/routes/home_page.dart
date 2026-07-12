@@ -231,13 +231,9 @@ class HomePageState extends State<HomePage>
       return;
     }
 
-    if (type == FlowButtonType.eny) {
-      context.push("/integrations/eny");
-    } else {
-      type ??= FlowButtonType.expense;
+    type ??= FlowButtonType.expense;
 
       context.push("/transaction/new?type=${type.value}");
-    }
   }
 
   void _pushNotificationPath(NotificationResponse response) {

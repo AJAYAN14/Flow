@@ -9,7 +9,6 @@ import "package:flow/prefs/local_preferences.dart";
 import "package:flow/services/user_preferences.dart";
 import "package:flow/utils/should_execute_scheduled_task.dart";
 import "package:flutter/foundation.dart";
-import "package:in_app_review/in_app_review.dart";
 import "package:logging/logging.dart";
 import "package:moment_dart/moment_dart.dart";
 
@@ -64,31 +63,7 @@ class ActionableNotificationsService {
       return;
     }
 
-    if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
-      try {
-        final DateTime? lastRateAppShowedAt = TransitiveLocalPreferences()
-            .lastRateAppShowedAt
-            .get();
 
-        if (shouldExecuteScheduledTask(
-          Duration(days: 75),
-          lastRateAppShowedAt,
-        )) {
-          add(
-            RateApp(
-              payload: await InAppReview.instance.isAvailable().catchError(
-                (_) => false,
-              ),
-            ),
-          );
-          await TransitiveLocalPreferences().lastRateAppShowedAt.set(
-            Moment.now(),
-          );
-        }
-      } catch (e) {
-        _log.warning("Failed to evaluate RateApp actionable notification", e);
-      }
-    }
 
     if (_notifications.value.isNotEmpty) {
       return;

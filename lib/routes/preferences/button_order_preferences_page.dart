@@ -3,7 +3,7 @@ import "dart:developer";
 import "package:dashed_border/dashed_border.dart";
 import "package:flow/data/flow_button_type.dart";
 import "package:flow/l10n/extensions.dart";
-import "package:flow/services/integrations/eny.dart";
+
 import "package:flow/services/user_preferences.dart";
 import "package:flow/widgets/general/info_text.dart";
 import "package:flow/widgets/home/preferences/button_order_preferences/transaction_type_button.dart";
@@ -35,10 +35,6 @@ class ButtonOrderPreferencesPageState
     final List<FlowButtonType> transactionButtonOrder = List.from(
       UserPreferencesService().transactionButtonOrder,
     );
-
-    if (EnyService().apiKey.value?.startsWith("eny") != true) {
-      transactionButtonOrder.remove(FlowButtonType.eny);
-    }
 
     final int count = transactionButtonOrder.length;
     final Size size = _calculateTotalSize(count);

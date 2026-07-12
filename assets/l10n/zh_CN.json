@@ -781,6 +781,7 @@
   "transaction.date": "交易日期",
   "transaction.delete": "删除交易",
   "transaction.deleted": "最近删除",
+  "transaction.details": "交易详情",
   "transaction.description": "备注",
   "transaction.description.add": "新增备注",
   "transaction.description.markdownSupported": "支援 Markdown",

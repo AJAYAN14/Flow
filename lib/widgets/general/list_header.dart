@@ -20,10 +20,10 @@ class ListHeader extends StatelessWidget {
       padding: padding.copyWith(bottom: 8.0, top: 12.0),
       child: Text(
         title.toUpperCase(), 
-        style: style ?? context.textTheme.labelSmall?.copyWith(
-          color: const Color(0xFF64748B), // Slate 500
-          letterSpacing: 0.8,
-          fontWeight: FontWeight.w600,
+        style: style ?? context.textTheme.titleSmall?.copyWith(
+          color: context.colorScheme.onSurface.withAlpha(0xB3), // 70% opacity
+          letterSpacing: 0.5,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

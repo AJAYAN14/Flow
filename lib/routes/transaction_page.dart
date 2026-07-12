@@ -52,8 +52,9 @@ import "package:flow/widgets/open_street_map.dart";
 import "package:flow/widgets/sheets/select_account_sheet.dart";
 import "package:flow/widgets/sheets/select_category_sheet.dart";
 import "package:flow/widgets/sheets/select_transaction_tags_sheet.dart";
-import "package:flow/widgets/transaction/imported_from_eny.dart";
+
 import "package:flow/widgets/transaction/imported_from_siri.dart";
+import "package:flow/widgets/transaction/imported_from_wechat.dart";
 import "package:flow/widgets/transaction/type_selector.dart";
 import "package:flutter/foundation.dart" hide Category;
 import "package:flutter/material.dart";
@@ -631,8 +632,8 @@ class _TransactionPageState extends State<TransactionPage> {
                                     case String providerName) ...[
                                   const SizedBox(height: 8.0),
                                   switch (providerName.toLowerCase()) {
-                                    "eny" => const ImportedFromEny(),
                                     "siri" => const ImportedFromSiri(),
+                                    "wechat" => const ImportedFromWechat(),
                                     _ => Text(
                                       "transaction.external.from".t(
                                         context,

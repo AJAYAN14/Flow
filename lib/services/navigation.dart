@@ -72,14 +72,5 @@ class NavigationService {
       return;
     }
 
-    if (uri.pathSegments.join("/") == "integrate/eny") {
-      if (uri.queryParameters["apiKey"] case String candidate
-          when candidate.startsWith("eny")) {
-        NavigationService().add("/integrate/eny?${uri.query}");
-      } else {
-        _log.info("Ignoring Eny link with no API key in query: $uri");
-      }
-      return;
-    }
   }
 }

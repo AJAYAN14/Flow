@@ -1,3 +1,4 @@
+import "package:flow/data/transaction_filter.dart";
 import "package:flow/data/transaction_programmable_object.dart";
 import "package:flow/entity/account.dart";
 import "package:flow/entity/category.dart";
@@ -49,6 +50,7 @@ class _TpoPreviewListItemState extends State<TpoPreviewListItem> {
               recoverFromTrashFn: null,
               moveToTrashFn: null,
               combineTransfers: false,
+              groupRange: TransactionGroupRange.month,
             ),
     );
   }
@@ -74,6 +76,7 @@ class _TpoPreviewListItemState extends State<TpoPreviewListItem> {
       isPending: widget.tpo.isPending,
       transactionDate: widget.tpo.transactionDate,
       uuid: const Uuid().v4(),
+      extraTags: widget.tpo.extraTags ?? const [],
     );
 
     if (widget.tpo.type == .transfer) {

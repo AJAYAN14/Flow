@@ -1,4 +1,3 @@
-import "package:flow/constants.dart";
 import "package:flow/data/flow_icon.dart";
 import "package:flow/data/money.dart";
 import "package:flow/data/transaction_filter.dart";
@@ -129,27 +128,7 @@ class TransactionListTile extends StatelessWidget {
       if (effectiveTheme.showExternalSourceOrDefault)
         if (transaction.externalProviderName
             case String externalProviderName) ...[
-          TextSpan(
-            children: [
-              if (externalProviderName == "Siri")
-                WidgetSpan(
-                  child: Padding(
-                    padding: .only(right: 4.0),
-                    child: Image.asset("assets/images/siri.png", height: 12.0),
-                  ),
-                  alignment: .middle,
-                ),
-              if (externalProviderName == "Eny")
-                WidgetSpan(
-                  child: Padding(
-                    padding: .only(right: 4.0),
-                    child: Image.network(enyLogoUrl, height: 12.0),
-                  ),
-                  alignment: .middle,
-                ),
               TextSpan(text: externalProviderName),
-            ],
-          ),
         ],
       TextSpan(text: dateString),
       if (transaction.transactionDate.isFuture)
@@ -368,11 +347,19 @@ class TransactionListTile extends StatelessWidget {
     } else if (transaction.category.target != null) {
       iconData = transaction.category.target!.icon;
       colorScheme = transaction.category.target!.colorScheme;
+    } else if ((transaction.title ?? "").trim().isNotEmpty) {
+      iconData = FlowIconData.emoji(
+        (transaction.title ?? "").trim().characters.first.toString(),
+      );
     } else {
       iconData = FlowIconData.icon(Symbols.circle_rounded);
     }
 
-    final Color effectiveColor = colorScheme?.primary ?? context.colorScheme.primary;
+    Color effectiveColor = colorScheme?.primary ?? context.colorScheme.primary;
+    if (colorScheme == null && iconData is CharacterFlowIcon) {
+      final int hash = (transaction.title ?? "").trim().hashCode;
+      effectiveColor = Colors.primaries[hash.abs() % Colors.primaries.length];
+    }
 
     return Container(
       padding: const EdgeInsets.all(10.0),

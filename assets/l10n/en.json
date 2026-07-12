@@ -781,6 +781,7 @@
   "transaction.date": "Transaction date",
   "transaction.delete": "Delete transaction",
   "transaction.deleted": "Recently deleted",
+  "transaction.details": "Details",
   "transaction.description": "Notes",
   "transaction.description.add": "Add notes",
   "transaction.description.markdownSupported": "Markdown supported",

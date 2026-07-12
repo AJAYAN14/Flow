@@ -1,4 +1,7 @@
+import "dart:io";
+
 import "package:flow/l10n/extensions.dart";
+import "package:flow/services/currency_registry.dart";
 import "package:flow/services/user_preferences.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/widgets/general/button.dart";
@@ -7,6 +10,7 @@ import "package:flow/widgets/sheets/select_currency_sheet.dart";
 import "package:flutter/material.dart";
 import "package:flutter/scheduler.dart";
 import "package:go_router/go_router.dart";
+import "package:intl/intl.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
 
 class SetupCurrencyPage extends StatefulWidget {
@@ -29,8 +33,26 @@ class _SetupCurrencyPageState extends State<SetupCurrencyPage> {
   void initState() {
     super.initState();
 
+    try {
+      final String? localeCurrency =
+          NumberFormat.simpleCurrency(locale: Platform.localeName).currencyName;
+      
+      if (localeCurrency != null) {
+        final bool isValid = CurrencyRegistryService().allCurrencies.any(
+          (c) => c.code == localeCurrency,
+        );
+
+        if (isValid) {
+          _currency = localeCurrency;
+          _textController.text = localeCurrency;
+        }
+      }
+    } catch (_) {}
+
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      selectCurrency();
+      if (_currency == null) {
+        selectCurrency();
+      }
     });
   }
 

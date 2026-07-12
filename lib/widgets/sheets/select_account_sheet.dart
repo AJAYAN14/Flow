@@ -54,17 +54,19 @@ class _SelectAccountSheetState extends State<SelectAccountSheet> {
       title: Text(
         widget.titleOverride ?? "transaction.edit.selectAccount".t(context),
       ),
-      trailing: widget.accounts.isEmpty
-          ? ModalOverflowBar(
-              alignment: .end,
-              children: [
-                Button(
-                  onTap: () => context.pop(),
-                  child: Text("general.cancel".t(context)),
-                ),
-              ],
-            )
-          : null,
+      trailing: ModalOverflowBar(
+        alignment: .end,
+        children: [
+          Button(
+            onTap: () {
+              context.pop();
+              context.push("/account/new");
+            },
+            leading: const Icon(Symbols.add_rounded),
+            child: Text("account.new".t(context)),
+          ),
+        ],
+      ),
       leading: showSearchBar
           ? Frame(
               child: TextField(

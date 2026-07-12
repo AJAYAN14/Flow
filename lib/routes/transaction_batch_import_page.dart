@@ -2,6 +2,7 @@ import "package:flow/data/flow_icon.dart";
 import "package:flow/data/transaction_multi_programmable_object.dart";
 import "package:flow/data/transaction_programmable_object.dart";
 import "package:flow/entity/account.dart";
+import "package:flow/entity/transaction.dart";
 import "package:flow/l10n/extensions.dart";
 import "package:flow/objectbox/actions.dart";
 import "package:flow/providers/accounts_provider.dart";
@@ -40,6 +41,8 @@ class _TransactionBatchImportPageState
   String? _toAccountUuid;
 
   bool assignIndividually = false;
+
+  bool _hideWechatBankCardTransactions = true;
 
   bool _busy = false;
 
@@ -97,10 +100,39 @@ class _TransactionBatchImportPageState
                       child: Text("transactions.batch.review".t(context)),
                     ),
                   ),
+                  if (widget.params?.t.any((tpo) => tpo.extraTags?.contains(Transaction.importedFromWechatBankCardTag) == true) == true)
+                    SwitchListTile(
+                      title: Text("隐藏非零钱支付（银行卡等）的交易"),
+                      subtitle: Text("开启后将只导入零钱或零钱通支付的交易，避免与银行卡账单重复"),
+                      value: _hideWechatBankCardTransactions,
+                      onChanged: (val) {
+                        setState(() {
+                          _hideWechatBankCardTransactions = val;
+                        });
+                      },
+                    ),
                   const SizedBox(height: 8.0),
-                  ...?widget.params?.t.map(
-                    (tpo) => TpoPreviewListItem(tpo: tpo),
-                  ),
+                  if (widget.params != null) ...[
+                    Builder(
+                      builder: (context) {
+                        final filteredTpos = widget.params!.t.where((tpo) {
+                          if (_hideWechatBankCardTransactions &&
+                              tpo.extraTags?.contains(Transaction.importedFromWechatBankCardTag) == true) {
+                            return false;
+                          }
+                          return true;
+                        }).toList();
+
+                        return Expanded(
+                          child: ListView.builder(
+                            itemCount: filteredTpos.length,
+                            itemBuilder: (context, index) =>
+                                TpoPreviewListItem(tpo: filteredTpos[index]),
+                          ),
+                        );
+                      },
+                    ),
+                  ]
                 ],
               ),
             ),
@@ -170,11 +202,23 @@ class _TransactionBatchImportPageState
                   leading: FlowIcon(
                     FlowIconData.icon(Symbols.download_rounded),
                   ),
-                  child: Text(
-                    "transactions.batch.importN".t(
-                      context,
-                      widget.params?.t.length ?? 0,
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      final filteredCount = widget.params?.t.where((tpo) {
+                        if (_hideWechatBankCardTransactions &&
+                            tpo.extraTags?.contains(Transaction.importedFromWechatBankCardTag) == true) {
+                          return false;
+                        }
+                        return true;
+                      }).length ?? 0;
+
+                      return Text(
+                        "transactions.batch.importN".t(
+                          context,
+                          filteredCount,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -256,13 +300,20 @@ class _TransactionBatchImportPageState
     });
 
     final List<TransactionProgrammableObject> tpos =
-        widget.params?.t ?? <TransactionProgrammableObject>[];
+        widget.params?.t.where((tpo) {
+      if (_hideWechatBankCardTransactions &&
+          tpo.extraTags?.contains(Transaction.importedFromWechatBankCardTag) == true) {
+        return false;
+      }
+      return true;
+    }).toList() ?? <TransactionProgrammableObject>[];
 
     try {
       for (final TransactionProgrammableObject tpo in tpos) {
         tpo.save(
           fromAccountOverride: _fromAccountUuid,
           toAccountOverride: _toAccountUuid,
+          extraTags: tpo.extraTags,
         );
       }
       if (!mounted) return;

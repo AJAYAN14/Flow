@@ -65,7 +65,6 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
                     child: TextFormField(
                       controller: _textEditingController,
                       autofocus: true,
-                      validator: validateRequiredField,
                       textInputAction: TextInputAction.send,
                       onFieldSubmitted: (value) => save(),
                     ),
@@ -120,11 +119,13 @@ class _SetupProfilePageState extends State<SetupProfilePage> {
     _updateProfile();
 
     final String trimmed = _textEditingController.text.trim();
+    final String finalName = trimmed.isEmpty ? "用户" : trimmed;
+    
     try {
       if (_currentlyEditing != null) {
-        _currentlyEditing!.name = trimmed;
+        _currentlyEditing!.name = finalName;
       } else {
-        _currentlyEditing = Profile(name: trimmed);
+        _currentlyEditing = Profile(name: finalName);
       }
 
       final updatedProfile = await ObjectBox().box<Profile>().putAndGetAsync(

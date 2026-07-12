@@ -92,15 +92,26 @@ class Transaction implements EntityBase {
   List<String> extraTags;
 
   static const String importedFromSiriTag = "ios:importedFromSiri";
+  static const String importedFromWechatTag = "import:wechat";
+  static const String importedFromWechatBankCardTag = "import:wechat:bankCard";
+  static const String importedFromWechatTransferTag = "import:wechat:transfer";
+  static const String importedFromAlipayTag = "import:alipay";
+  static const String importedFromAlipayBankCardTag = "import:alipay:bankCard";
+  static const String importedFromAlipayTransferTag = "import:alipay:transfer";
 
   String? get externalProviderName {
     if (extraTags.contains(importedFromSiriTag)) {
       return "Siri";
     }
 
-    if (extensions.eny != null) {
-      return "Eny";
+    if (extraTags.contains(importedFromWechatTag)) {
+      return "WeChat";
     }
+
+    if (extraTags.contains(importedFromAlipayTag)) {
+      return "Alipay";
+    }
+
 
     return null;
   }

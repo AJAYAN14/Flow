@@ -26,22 +26,6 @@ abstract class ActionableNotification<T> {
 
 
 
-
-class RateApp extends ActionableNotification<bool> {
-  @override
-  final FlowIconData icon = const IconFlowIcon(Symbols.star_rounded);
-
-  /// Whether the app can open in-app sheet
-  @override
-  final bool payload;
-
-  @override
-  final ActionableNotificationPriority priority =
-      ActionableNotificationPriority.medium;
-
-  RateApp({required this.payload});
-}
-
 class AutoBackupReminder extends ActionableNotification<BackupEntry?> {
   @override
   final FlowIconData icon = const IconFlowIcon(Symbols.cloud_upload);

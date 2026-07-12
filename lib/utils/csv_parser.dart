@@ -8,7 +8,7 @@ import "package:logging/logging.dart";
 
 final Logger _log = Logger("CsvParser");
 
-Future<List<List>> parseCsvFromFile(File file) async {
+Future<List<List>> parseCsvFromFile(File file, {bool shouldParseNumbers = true}) async {
   final Uint8List bytes = file.readAsBytesSync();
 
   String? parsed;
@@ -47,8 +47,16 @@ Future<List<List>> parseCsvFromFile(File file) async {
   }
 
   if (parsed == null) {
+    try {
+      parsed = gbk.decode(bytes);
+    } catch (e) {
+      _log.fine("gbk decode failed", e);
+    }
+  }
+
+  if (parsed == null) {
     throw Exception(
-      "Unsupported text encoding. Please provide a CSV with one of following encodings: ascii, utf8, utf16, utf32, latin1",
+      "Unsupported text encoding. Please provide a CSV with one of following encodings: ascii, utf8, utf16, utf32, latin1, gbk",
     );
   }
 
@@ -56,5 +64,6 @@ Future<List<List>> parseCsvFromFile(File file) async {
 
   return CsvToListConverter(
     eol: LineBreakNormalizer.terminator,
+    shouldParseNumbers: shouldParseNumbers,
   ).convert(lineBreaksNormalized);
 }

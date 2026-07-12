@@ -111,26 +111,14 @@ class FlowIcon extends StatelessWidget {
       CharacterFlowIcon character => SizedBox.square(
         dimension: size,
         child: Center(
-          child: RichText(
-            textHeightBehavior: TextHeightBehavior(
-              applyHeightToFirstAscent: false,
-              applyHeightToLastDescent: false,
-              leadingDistribution: TextLeadingDistribution.proportional,
+          child: Text(
+            character.character,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontFamily: "Poppins",
+              fontSize: size * 0.75,
+              color: color,
             ),
-            text: TextSpan(
-              text: character.character,
-              spellOut: false,
-              style: TextStyle(
-                overflow: TextOverflow.visible,
-                fontWeight: FontWeight.w500,
-                fontFamily: "Poppins",
-                fontSize: size * 0.75,
-                height: 1.0,
-                inherit: false,
-                color: color,
-              ),
-            ),
-            textDirection: TextDirection.ltr,
           ),
         ),
       ),

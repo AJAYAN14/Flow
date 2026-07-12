@@ -13,7 +13,7 @@ import "package:flow/services/notifications.dart";
 import "package:flow/services/user_preferences.dart";
 
 import "package:flow/utils/extensions.dart";
-import "package:flow/widgets/animated_eny_logo.dart";
+
 import "package:flow/widgets/general/directional_chevron.dart";
 import "package:flow/widgets/general/list_header.dart";
 import "package:flow/widgets/general/premium_list_tile.dart";
@@ -143,23 +143,6 @@ class PreferencesPageState extends State<PreferencesPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 24.0),
-            ListHeader("preferences.integrations".t(context), padding: const EdgeInsets.symmetric(horizontal: 24.0)),
-            PremiumListGroup(
-              children: [
-                PremiumListTile(
-                  title: const Text("Eny"),
-                  leadingWidget: const SizedBox(
-                    width: 20.0,
-                    height: 20.0,
-                    child: AnimatedEnyLogo(),
-                  ),
-                  accent: const Color(0xFF8B5CF6), // Purple
-                  onTap: () => _pushAndRefreshAfter("/preferences/integrations/eny"),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24.0),
             ListHeader("preferences.transactions".t(context), padding: const EdgeInsets.symmetric(horizontal: 24.0)),
             PremiumListGroup(
               children: [

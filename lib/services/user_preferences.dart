@@ -13,7 +13,7 @@ import "package:flow/entity/user_preferences/transaction_entry_flow.dart";
 import "package:flow/objectbox.dart";
 import "package:flow/objectbox/objectbox.g.dart";
 import "package:flow/services/currency_registry.dart";
-import "package:flow/services/integrations/eny.dart";
+
 import "package:flow/services/notifications.dart";
 import "package:flow/services/sync.dart";
 import "package:flow/services/widget_summary_sync.dart";
@@ -346,12 +346,9 @@ class UserPreferencesService {
 
   void _updateButtonsWidgets(List<FlowButtonType> order) async {
     try {
-      final String value = EnyService().isConnected
-          ? order.map((e) => e.value).join(",")
-          : order
-                .where((e) => e != FlowButtonType.eny)
-                .map((e) => e.value)
-                .join(",");
+      final String value = order
+          .map((e) => e.value)
+          .join(",");
       await HomeWidget.setAppGroupId(iOSAppGroupId);
       await HomeWidget.saveWidgetData("buttonOrder", value);
       await Future.wait([

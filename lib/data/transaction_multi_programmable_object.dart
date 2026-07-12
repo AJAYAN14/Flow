@@ -3,7 +3,7 @@ import "dart:convert";
 import "package:flow/data/transaction_programmable_object.dart";
 import "package:flow/entity/transaction/extensions/base.dart";
 import "package:flow/objectbox/actions.dart";
-import "package:flow/utils/loose_parsers.dart";
+
 
 class TransactionMultiProgrammableObject {
   final List<TransactionProgrammableObject> t;
@@ -71,56 +71,4 @@ class TransactionMultiProgrammableObject {
     }
   }
 
-  static TransactionMultiProgrammableObject? fromEnyJson(Map json) {
-    try {
-      final List<Map>? items = switch (json["items"]) {
-        Iterable itemList
-            when itemList.isNotEmpty && itemList.every((item) => item is Map) =>
-          itemList.cast<Map>().toList(),
-        _ => null,
-      };
-
-      if (items == null) {
-        return null;
-      }
-
-      final List<TransactionProgrammableObject> transactions = items
-          .map((item) {
-            try {
-              final itemMap = item as Map?;
-
-              if (itemMap == null) return null;
-
-              final String title = looseString(itemMap["name"]) ?? "An item";
-              final double amount = -(looseDouble(itemMap["amount"]) ?? 0.0);
-              final DateTime transactionDate = switch (looseString(
-                json["date"],
-              )) {
-                String dateString =>
-                  DateTime.tryParse(dateString) ?? DateTime.now(),
-                _ => DateTime.now(),
-              };
-              final int quantity =
-                  looseDouble(itemMap["quantity"])?.toInt() ?? 1;
-              final String notes =
-                  "Quantity: $quantity\n\n---\n\nImported from Eny";
-
-              return TransactionProgrammableObject(
-                title: title,
-                amount: amount,
-                transactionDate: transactionDate,
-                notes: notes,
-                category: looseString(itemMap["category"]),
-              );
-            } catch (e) {
-              return null;
-            }
-          })
-          .whereType<TransactionProgrammableObject>()
-          .toList();
-      return TransactionMultiProgrammableObject(t: transactions);
-    } catch (e) {
-      return null;
-    }
-  }
 }

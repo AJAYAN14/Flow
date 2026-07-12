@@ -22,7 +22,7 @@ class Surface extends StatelessWidget {
     this.iconColor,
     this.clipBehavior,
     this.shape = const RoundedRectangleBorder(
-      borderRadius: .all(Radius.circular(16.0)),
+      borderRadius: BorderRadius.all(Radius.circular(24.0)),
     ),
     this.elevation = 0.0,
     this.margin = EdgeInsets.zero,
@@ -47,7 +47,7 @@ class Surface extends StatelessWidget {
         ),
       ),
       child: Card(
-        color: color,
+        color: color ?? (parentTheme.brightness == Brightness.light ? Colors.white : null),
         shadowColor: shadowColor,
         surfaceTintColor: surfaceTintColor,
         elevation: elevation,
