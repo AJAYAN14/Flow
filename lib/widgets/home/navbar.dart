@@ -2,38 +2,23 @@ import "package:flow/l10n/extensions.dart";
 import "package:flow/theme/navbar_theme.dart";
 import "package:flow/widgets/home/navbar/navbar_button.dart";
 import "package:flutter/material.dart";
-import "package:flutter/physics.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
-
-class PortalSpringCurve extends Curve {
-  const PortalSpringCurve({
-    this.mass = 1.0,
-    this.stiffness = 180.0,
-    this.damping = 22.0,
-  });
-
-  final double mass;
-  final double stiffness;
-  final double damping;
-
-  @override
-  double transformInternal(double t) {
-    final simulation = SpringSimulation(
-      SpringDescription(mass: mass, stiffness: stiffness, damping: damping),
-      0.0,
-      1.0,
-      0.0,
-    );
-    return simulation.x(t).clamp(-0.1, 1.1);
-  }
-}
 
 class Navbar extends StatelessWidget {
   final Function(int i) onTap;
 
   final int activeIndex;
 
-  const Navbar({super.key, required this.onTap, this.activeIndex = 0});
+  /// Continuous page position from [TabController.animation].
+  /// When provided, the indicator tracks the swipe gesture in real-time.
+  final Animation<double>? pageAnimation;
+
+  const Navbar({
+    super.key,
+    required this.onTap,
+    this.activeIndex = 0,
+    this.pageAnimation,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,24 +37,41 @@ class Navbar extends StatelessWidget {
           final tabWidth = constraints.maxWidth / 4;
           const double indicatorPadding = 4.0;
 
+          final Widget indicator = Container(
+            decoration: BoxDecoration(
+              color: navbarTheme.activeIconColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(999.9),
+            ),
+          );
+
+          final Widget positionedIndicator = pageAnimation != null
+              ? AnimatedBuilder(
+                  animation: pageAnimation!,
+                  builder: (context, child) {
+                    final double position = pageAnimation!.value;
+                    return Positioned(
+                      left: position * tabWidth + indicatorPadding,
+                      top: indicatorPadding,
+                      bottom: indicatorPadding,
+                      width: tabWidth - indicatorPadding * 2,
+                      child: child!,
+                    );
+                  },
+                  child: indicator,
+                )
+              : AnimatedPositioned(
+                  left: activeIndex * tabWidth + indicatorPadding,
+                  top: indicatorPadding,
+                  bottom: indicatorPadding,
+                  width: tabWidth - indicatorPadding * 2,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                  child: indicator,
+                );
+
           return Stack(
             children: [
-              // Sliding indicator — inset by indicatorPadding on all sides,
-              // matching Nemo's indicatorPadding = 4.dp
-              AnimatedPositioned(
-                left: activeIndex * tabWidth + indicatorPadding,
-                top: indicatorPadding,
-                bottom: indicatorPadding,
-                width: tabWidth - indicatorPadding * 2,
-                duration: const Duration(milliseconds: 400),
-                curve: const PortalSpringCurve(stiffness: 200, damping: 15),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: navbarTheme.activeIconColor.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(999.9),
-                  ),
-                ),
-              ),
+              positionedIndicator,
               // Tab buttons
               Row(
                 children: [

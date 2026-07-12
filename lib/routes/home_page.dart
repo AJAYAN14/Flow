@@ -66,9 +66,12 @@ class HomePageState extends State<HomePage>
     );
 
     _tabController.addListener(() {
-      setState(() {
-        _currentIndex = _tabController.index;
-      });
+      if (_currentIndex != _tabController.index) {
+        HapticFeedback.selectionClick();
+        setState(() {
+          _currentIndex = _tabController.index;
+        });
+      }
     });
 
     Future.delayed(const Duration(milliseconds: 250)).then((_) {
@@ -181,6 +184,7 @@ class HomePageState extends State<HomePage>
                                 child: Navbar(
                                   onTap: (i) => _navigateTo(i),
                                   activeIndex: _currentIndex,
+                                  pageAnimation: _tabController.animation,
                                 ),
                               ),
                               const SizedBox(width: 12.0),

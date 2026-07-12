@@ -14,6 +14,7 @@ import "package:flow/widgets/general/money_text.dart";
 import "package:flow/widgets/transaction_list_tile/transaction_subtitle.dart";
 import "package:flow/widgets/transaction_list_tile_theme.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_slidable/flutter_slidable.dart";
 import "package:go_router/go_router.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
@@ -167,7 +168,10 @@ class TransactionListTile extends StatelessWidget {
     final Widget leading = onSelectionToggle != null
         ? GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => onSelectionToggle!(),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onSelectionToggle!();
+            },
             child: visualLeading,
           )
         : visualLeading;
@@ -189,8 +193,14 @@ class TransactionListTile extends StatelessWidget {
         children: [
           InkWell(
             onTap: selectionActive
-                ? (onSelectionToggle ?? () {})
-                : () => context.push("/transaction/${transaction.id}"),
+                ? () {
+                    HapticFeedback.selectionClick();
+                    (onSelectionToggle ?? () {})();
+                  }
+                : () {
+                    HapticFeedback.lightImpact();
+                    context.push("/transaction/${transaction.id}");
+                  },
             child: Padding(
               padding: effectiveTheme.paddingOrDefault,
               child: Column(
@@ -282,7 +292,10 @@ class TransactionListTile extends StatelessWidget {
                   mainAxisAlignment: .end,
                   children: [
                     TextButton.icon(
-                      onPressed: () => confirmFn!(),
+                      onPressed: () {
+                        HapticFeedback.mediumImpact();
+                        confirmFn!();
+                      },
                       label: Text("general.confirm".t(context)),
                       icon: Icon(Symbols.check_rounded),
                     ),
@@ -310,7 +323,10 @@ class TransactionListTile extends StatelessWidget {
     final List<SlidableAction> startActions = [
       if (showDuplicateButton)
         SlidableAction(
-          onPressed: (context) => duplicateFn!(),
+          onPressed: (context) {
+            HapticFeedback.mediumImpact();
+            duplicateFn!();
+          },
           icon: Symbols.content_copy_rounded,
           backgroundColor: context.flowColors.semi,
         ),
@@ -319,13 +335,19 @@ class TransactionListTile extends StatelessWidget {
     final List<SlidableAction> endActions = [
       if (showConfirmButton)
         SlidableAction(
-          onPressed: (context) => confirmFn!(),
+          onPressed: (context) {
+            HapticFeedback.mediumImpact();
+            confirmFn!();
+          },
           icon: Symbols.check_rounded,
           backgroundColor: context.colorScheme.primary,
         ),
       if (showHoldButton)
         SlidableAction(
-          onPressed: (context) => confirmFn!(false),
+          onPressed: (context) {
+            HapticFeedback.mediumImpact();
+            confirmFn!(false);
+          },
           icon: Symbols.cancel_rounded,
           backgroundColor: context.flowColors.expense,
         ),
@@ -333,7 +355,10 @@ class TransactionListTile extends StatelessWidget {
           !showHoldButton &&
           transaction.isDeleted != true)
         SlidableAction(
-          onPressed: (context) => moveToTrashFn!(),
+          onPressed: (context) {
+            HapticFeedback.heavyImpact();
+            moveToTrashFn!();
+          },
           icon: Symbols.delete_forever_rounded,
           backgroundColor: context.flowColors.expense,
         ),
@@ -341,7 +366,10 @@ class TransactionListTile extends StatelessWidget {
           !showHoldButton &&
           transaction.isDeleted == true)
         SlidableAction(
-          onPressed: (context) => recoverFromTrashFn!(),
+          onPressed: (context) {
+            HapticFeedback.mediumImpact();
+            recoverFromTrashFn!();
+          },
           icon: Symbols.restore_page_rounded,
           backgroundColor: context.flowColors.income,
         ),

@@ -68,25 +68,28 @@ class _ProfilePictureState extends State<ProfilePicture> {
       child: Stack(
         children: [
           child,
-          InkWell(
-            onTap: widget.onTap,
-            borderRadius: .circular(999.9),
-            child: AnimatedOpacity(
-              opacity: widget.showOverlayUponHover
-                  ? (showOverlay ? 1.0 : 0.5)
-                  : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: DecoratedBox(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0x40000000),
-                ),
-                child: SizedBox.square(
-                  dimension: widget.size,
-                  child: Icon(
-                    widget.overlayIcon,
-                    size: widget.size / 2,
-                    color: const Color(0xFFFFFFFF),
+          Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: widget.onTap,
+              borderRadius: BorderRadius.circular(999.9),
+              child: AnimatedOpacity(
+                opacity: widget.showOverlayUponHover
+                    ? (showOverlay ? 1.0 : 0.5)
+                    : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0x40000000),
+                  ),
+                  child: SizedBox.square(
+                    dimension: widget.size,
+                    child: Icon(
+                      widget.overlayIcon,
+                      size: widget.size / 2,
+                      color: const Color(0xFFFFFFFF),
+                    ),
                   ),
                 ),
               ),

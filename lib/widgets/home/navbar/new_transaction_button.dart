@@ -9,6 +9,7 @@ import "package:flow/services/user_preferences.dart";
 import "package:flow/theme/theme.dart";
 import "package:flow/utils/extensions/directionality.dart";
 import "package:flutter/material.dart" hide Flow;
+import "package:flutter/services.dart";
 import "package:material_symbols_icons_flow/symbols.dart";
 import "package:pie_menu/pie_menu.dart";
 
@@ -67,7 +68,10 @@ class _NewTransactionButtonState extends State<NewTransactionButton>
               .map(
                 (transactionType) => PieAction(
                   tooltip: Text(transactionType.localizedNameContext(context)),
-                  onSelect: () => widget.onActionTap(transactionType),
+                  onSelect: () {
+                    HapticFeedback.mediumImpact();
+                    widget.onActionTap(transactionType);
+                  },
                   child: Icon(transactionType.icon, weight: 800.0),
                   buttonTheme: PieButtonTheme(
                     backgroundColor: transactionType.actionBackgroundColor(
@@ -122,6 +126,7 @@ class _NewTransactionButtonState extends State<NewTransactionButton>
 
   void onToggle(bool toggled) {
     if (toggled) {
+      HapticFeedback.lightImpact();
       _animationController.forward();
     } else {
       _animationController.reverse();
