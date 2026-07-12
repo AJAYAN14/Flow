@@ -110,19 +110,61 @@ class FlowIcon extends StatelessWidget {
       ),
       CharacterFlowIcon character => SizedBox.square(
         dimension: size,
-        child: Center(
-          child: Text(
-            character.character,
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontFamily: "Poppins",
-              fontSize: size * 0.75,
-              color: color,
-            ),
+        child: CustomPaint(
+          size: Size.square(size),
+          painter: _CharacterPainter(
+            character: character.character,
+            fontSize: size * 0.75,
+            color: color,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
       _ => Container(),
     };
   }
+}
+
+class _CharacterPainter extends CustomPainter {
+  final String character;
+  final double fontSize;
+  final Color color;
+  final FontWeight fontWeight;
+
+  _CharacterPainter({
+    required this.character,
+    required this.fontSize,
+    required this.color,
+    required this.fontWeight,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final TextPainter tp = TextPainter(
+      text: TextSpan(
+        text: character,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+          height: 1.0,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    // Center the text painter's layout box within the canvas
+    final double dx = (size.width - tp.width) / 2;
+    final double dy = (size.height - tp.height) / 2;
+
+    tp.paint(canvas, Offset(dx, dy));
+    tp.dispose();
+  }
+
+  @override
+  bool shouldRepaint(_CharacterPainter oldDelegate) =>
+      character != oldDelegate.character ||
+      fontSize != oldDelegate.fontSize ||
+      color != oldDelegate.color ||
+      fontWeight != oldDelegate.fontWeight;
 }
