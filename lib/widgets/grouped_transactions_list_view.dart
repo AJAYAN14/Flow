@@ -13,9 +13,7 @@ import "package:moment_dart/moment_dart.dart";
 
 enum GroupedTransactionsListViewType {
   list(false),
-  sliver(true),
-  reorderable(false),
-  sliverReorderable(true);
+  sliver(true);
 
   final bool isSliver;
 
@@ -182,11 +180,7 @@ class _GroupedTransactionsListViewState
                 : headerPadding,
             child: header,
           ),
-          (Transaction transaction) => ReorderableDelayedDragStartListener(
-            index: index,
-            key: ValueKey(transaction.uuid),
-            enabled: widget.selectionController?.active != true,
-            child: TransactionListTile(
+          (Transaction transaction) => TransactionListTile(
               key: ValueKey(transaction.id),
               isFirstInGroup: index == 0 || flattened[index - 1] is! Transaction,
               isLastInGroup: index == flattened.length - 1 || flattened[index + 1] is! Transaction,
@@ -214,7 +208,6 @@ class _GroupedTransactionsListViewState
                   ? null
                   : () => widget.selectionController!.toggle(transaction),
             ),
-          ),
           (_) => Container(),
         };
 
@@ -228,19 +221,6 @@ class _GroupedTransactionsListViewState
         itemBuilder: itemBuilder,
         itemCount: flattened.length,
       ),
-      GroupedTransactionsListViewType.reorderable =>
-        ReorderableListView.builder(
-          itemBuilder: itemBuilder,
-          buildDefaultDragHandles: false,
-          itemCount: flattened.length,
-          onReorder: (i, j) => _onReorder(i, j, flattened),
-        ),
-      GroupedTransactionsListViewType.sliverReorderable =>
-        SliverReorderableList(
-          itemBuilder: itemBuilder,
-          itemCount: flattened.length,
-          onReorder: (i, j) => _onReorder(i, j, flattened),
-        ),
     };
 
     return SlidableAutoCloseBehavior(child: list);
@@ -252,39 +232,7 @@ class _GroupedTransactionsListViewState
     setState(() {});
   }
 
-  void _onReorder(int oldIndex, int newIndex, List flattened) {
-    if (widget.selectionController?.active == true) return;
-    if (oldIndex == newIndex) return;
 
-    final a = flattened[oldIndex];
-    dynamic b = flattened[newIndex];
-
-    final int direction = oldIndex - newIndex;
-
-    final List priorities = [];
-
-    if (direction > 0) {
-      priorities.add(flattened[newIndex]);
-      if (newIndex < flattened.length - 2) {
-        priorities.add(flattened[newIndex - 1]);
-      }
-    } else {
-      if (newIndex >= 1) {
-        priorities.add(flattened[newIndex - 1]);
-      }
-
-      priorities.add(flattened[newIndex]);
-    }
-
-    priorities.add(b);
-
-    for (var p in priorities) {
-      if (p is Transaction) {
-        TransactionsService().updateTransactionDateSync(a, p.transactionDate);
-        return;
-      }
-    }
-  }
 
   void _rerender() {
     if (!mounted) return;

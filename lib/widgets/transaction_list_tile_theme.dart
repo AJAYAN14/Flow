@@ -68,7 +68,7 @@ class TransactionListTileThemeData {
 
   static const TransactionListTileThemeData fallback =
       TransactionListTileThemeData(
-        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         useCategoryNameForUntitledTransactions: true,
         useAccountIconForLeading: false,
         showExternalSource: true,

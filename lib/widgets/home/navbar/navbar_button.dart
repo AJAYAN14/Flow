@@ -1,3 +1,4 @@
+import "package:flow/prefs/local_preferences.dart";
 import "package:flow/theme/navbar_theme.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -59,7 +60,9 @@ class _NavbarButtonState extends State<NavbarButton>
 
   void _handleTap() {
     _pulseController.forward(from: 0.0);
-    HapticFeedback.lightImpact();
+    if (LocalPreferences().enableHapticFeedback.get()) {
+      HapticFeedback.lightImpact();
+    }
     widget.onTap(widget.index);
   }
 

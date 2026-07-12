@@ -206,7 +206,7 @@ class TransactionListTile extends StatelessWidget {
               child: Column(
                 children: [
               Row(
-                crossAxisAlignment: .start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 spacing: effectiveTheme.spacingOrDefault,
                 children: [
                   leading,
@@ -226,8 +226,9 @@ class TransactionListTile extends StatelessWidget {
                               TextSpan(text: resolvedTitle),
                             ],
                             style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: context.colorScheme.onSurface,
+                              fontFamilyFallback: const ['PingFang SC', 'Heiti SC', 'Microsoft YaHei'],
                             ),
                           ),
                           maxLines: 3,

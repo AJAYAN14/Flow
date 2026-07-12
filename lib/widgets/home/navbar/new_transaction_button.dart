@@ -3,6 +3,7 @@ import "dart:math";
 import "package:flow/data/flow_button_type.dart";
 import "package:flow/entity/user_preferences.dart";
 import "package:flow/l10n/named_enum.dart";
+import "package:flow/prefs/local_preferences.dart";
 
 import "package:flow/services/user_preferences.dart";
 
@@ -66,13 +67,18 @@ class _NewTransactionButtonState extends State<NewTransactionButton>
           onToggle: onToggle,
           actions: buttonOrder
               .map(
-                (transactionType) => PieAction(
+                (transactionType) => PieAction.builder(
                   tooltip: Text(transactionType.localizedNameContext(context)),
                   onSelect: () {
-                    HapticFeedback.mediumImpact();
+                    if (LocalPreferences().enableHapticFeedback.get()) {
+                      HapticFeedback.mediumImpact();
+                    }
                     widget.onActionTap(transactionType);
                   },
-                  child: Icon(transactionType.icon, weight: 800.0),
+                  builder: (hovered) => _HoverHapticFeedback(
+                    hovered: hovered,
+                    child: Icon(transactionType.icon, weight: 800.0),
+                  ),
                   buttonTheme: PieButtonTheme(
                     backgroundColor: transactionType.actionBackgroundColor(
                       context,
@@ -126,10 +132,39 @@ class _NewTransactionButtonState extends State<NewTransactionButton>
 
   void onToggle(bool toggled) {
     if (toggled) {
-      HapticFeedback.lightImpact();
+      if (LocalPreferences().enableHapticFeedback.get()) {
+        HapticFeedback.lightImpact();
+      }
       _animationController.forward();
     } else {
       _animationController.reverse();
     }
+  }
+}
+
+class _HoverHapticFeedback extends StatefulWidget {
+  final bool hovered;
+  final Widget child;
+
+  const _HoverHapticFeedback({required this.hovered, required this.child});
+
+  @override
+  State<_HoverHapticFeedback> createState() => _HoverHapticFeedbackState();
+}
+
+class _HoverHapticFeedbackState extends State<_HoverHapticFeedback> {
+  @override
+  void didUpdateWidget(covariant _HoverHapticFeedback oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.hovered && !oldWidget.hovered) {
+      if (LocalPreferences().enableHapticFeedback.get()) {
+        HapticFeedback.selectionClick();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

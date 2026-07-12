@@ -67,7 +67,6 @@ class HomePageState extends State<HomePage>
 
     _tabController.addListener(() {
       if (_currentIndex != _tabController.index) {
-        HapticFeedback.selectionClick();
         setState(() {
           _currentIndex = _tabController.index;
         });
@@ -176,23 +175,26 @@ class HomePageState extends State<HomePage>
                       child: AnimatedSlide(
                         offset: Offset(0.0, hideBottomNav ? 2.0 : 0.0),
                         duration: const Duration(milliseconds: 100),
-                        child: Frame(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Navbar(
-                                  onTap: (i) => _navigateTo(i),
-                                  activeIndex: _currentIndex,
-                                  pageAnimation: _tabController.animation,
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: Frame(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Navbar(
+                                    onTap: (i) => _navigateTo(i),
+                                    activeIndex: _currentIndex,
+                                    pageAnimation: _tabController.animation,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 12.0),
-                              NewTransactionButton(
-                                onActionTap: (type) =>
-                                    _newTransactionPage(type),
-                              ),
-                            ],
+                                const SizedBox(width: 12.0),
+                                NewTransactionButton(
+                                  onActionTap: (type) =>
+                                      _newTransactionPage(type),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

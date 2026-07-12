@@ -251,7 +251,7 @@ class _AccountPageState extends State<AccountPage> {
                 ),
               ),
               _ => GroupedTransactionsListView(
-                listType: GroupedTransactionsListViewType.reorderable,
+                listType: GroupedTransactionsListViewType.list,
                 selectionController: _selection,
                 mainHeader: header,
                 transactions: grouped,

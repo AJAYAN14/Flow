@@ -324,7 +324,7 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
             );
 
         return GroupedTransactionsListView(
-          listType: GroupedTransactionsListViewType.sliverReorderable,
+          listType: GroupedTransactionsListViewType.sliver,
           selectionController: _selection,
           mainHeader: Column(
             mainAxisSize: MainAxisSize.min,
