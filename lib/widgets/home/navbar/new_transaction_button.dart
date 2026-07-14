@@ -25,6 +25,8 @@ class NewTransactionButton extends StatefulWidget {
 
 class _NewTransactionButtonState extends State<NewTransactionButton>
     with SingleTickerProviderStateMixin {
+  DateTime? _lastHoverTime;
+
   late final AnimationController _animationController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 200),
@@ -71,12 +73,19 @@ class _NewTransactionButtonState extends State<NewTransactionButton>
                   tooltip: Text(transactionType.localizedNameContext(context)),
                   onSelect: () {
                     if (LocalPreferences().enableHapticFeedback.get()) {
-                      HapticFeedback.mediumImpact();
+                      if (_lastHoverTime == null ||
+                          DateTime.now().difference(_lastHoverTime!) >
+                              const Duration(milliseconds: 150)) {
+                        HapticFeedback.mediumImpact();
+                      }
                     }
                     widget.onActionTap(transactionType);
                   },
                   builder: (hovered) => _HoverHapticFeedback(
                     hovered: hovered,
+                    onHoverVibrated: () {
+                      _lastHoverTime = DateTime.now();
+                    },
                     child: Icon(transactionType.icon, weight: 800.0),
                   ),
                   buttonTheme: PieButtonTheme(
@@ -144,9 +153,14 @@ class _NewTransactionButtonState extends State<NewTransactionButton>
 
 class _HoverHapticFeedback extends StatefulWidget {
   final bool hovered;
+  final VoidCallback onHoverVibrated;
   final Widget child;
 
-  const _HoverHapticFeedback({required this.hovered, required this.child});
+  const _HoverHapticFeedback({
+    required this.hovered,
+    required this.onHoverVibrated,
+    required this.child,
+  });
 
   @override
   State<_HoverHapticFeedback> createState() => _HoverHapticFeedbackState();
@@ -159,6 +173,7 @@ class _HoverHapticFeedbackState extends State<_HoverHapticFeedback> {
     if (widget.hovered && !oldWidget.hovered) {
       if (LocalPreferences().enableHapticFeedback.get()) {
         HapticFeedback.selectionClick();
+        widget.onHoverVibrated();
       }
     }
   }

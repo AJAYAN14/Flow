@@ -34,6 +34,10 @@ android {
     targetSdk = 36
     versionCode = flutter.versionCode
     versionName = flutter.versionName
+
+    ndk {
+      abiFilters += listOf("arm64-v8a")
+    }
   }
 
   val keystorePropertiesFile = rootProject.file("key.properties")

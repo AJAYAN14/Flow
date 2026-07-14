@@ -230,7 +230,7 @@ class _TransactionBatchImportPageState
   }
 
   void selectFromAccount() async {
-    final accounts = AccountsProvider.of(context).activeAccounts;
+    final accounts = AccountsProvider.read(context).activeAccounts;
 
     final selectedAccountId = accounts
         .firstWhereOrNull((account) => account.uuid == _fromAccountUuid)
@@ -262,7 +262,7 @@ class _TransactionBatchImportPageState
   }
 
   void selectToAccount() async {
-    final accounts = AccountsProvider.of(context).activeAccounts
+    final accounts = AccountsProvider.read(context).activeAccounts
         .where((account) => account.uuid != _fromAccountUuid)
         .toList();
 

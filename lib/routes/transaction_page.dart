@@ -793,7 +793,7 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   Future<void> selectAccount([bool fromAutomatedFlow = false]) async {
-    final accounts = AccountsProvider.of(context).activeAccounts;
+    final accounts = AccountsProvider.read(context).activeAccounts;
 
     if (fromAutomatedFlow && accounts.isEmpty) {
       return;
@@ -826,7 +826,7 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   Future<void> selectAccountTransferTo([bool fromAutomatedFlow = false]) async {
-    final accounts = AccountsProvider.of(context).activeAccounts;
+    final accounts = AccountsProvider.read(context).activeAccounts;
 
     final List<Account> toAccounts = accounts.where((element) {
       return element.id != _selectedAccount?.id;

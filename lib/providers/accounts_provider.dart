@@ -87,6 +87,12 @@ class AccountsProvider extends InheritedWidget {
   static AccountsProvider of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<AccountsProvider>()!;
 
+  static AccountsProvider read(BuildContext context) {
+    final element =
+        context.getElementForInheritedWidgetOfExactType<AccountsProvider>();
+    return element!.widget as AccountsProvider;
+  }
+
   @override
   bool updateShouldNotify(AccountsProvider oldWidget) =>
       !identical(_accounts, oldWidget._accounts);
